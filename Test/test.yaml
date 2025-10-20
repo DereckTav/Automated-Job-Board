@@ -1,0 +1,44 @@
+# TYPES
+#    - "DOWNLOAD"
+#    - "JS"
+#    - "STATIC"
+
+websites:
+  static-page:
+    url: "http://localhost:8080/static"
+    base_url: "http://localhost:8080"
+    parser_type: "STATIC"
+    date_format: '%Y-%m-%d'
+    selectors:
+      company_name: "div.flex-auto.line-height-4"
+      position: "div.flex-auto.line-height-4 div.truncate"
+      application_link: "div.domain-class"
+      description: "div.description-class"
+      date: "div.date-class"
+      #      company_size: "something"
+
+  dynamic-page:
+    url: "http://localhost:8080/dynamic"
+    base_url: "http://localhost:8080"
+    parser_type: "JS"
+    date_format: '%Y-%m-%d'
+    selectors:
+      company_name: "div.flex-auto.line-height-4"
+      position: "div.flex-auto.line-height-4 div.truncate"
+      application_link: "div.domain-class"
+      description: "div.description-class"
+      date: "div.date-class"
+      #      company_size: "something"
+
+  Csv_table:
+    url: "http://localhost:8080/csv"
+    accept: 'text/csv'
+    date_format: '%Y-%m-%d'
+    parser_type: "DOWNLOAD"
+    selectors:
+      company_name: "company_name"
+      position: "position"
+      application_link: "domain"
+      description: "description"
+      date: "date"
+      company_size: "company_size"

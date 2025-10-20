@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Listings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .flex-auto {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+
+        .line-height-4 {
+            line-height: 1.6;
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-class {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .domain-class {
+            color: #0066cc;
+            font-size: 13px;
+            margin-top: 8px;
+            text-decoration: none;
+        }
+
+        .domain-class:hover {
+            text-decoration: underline;
+        }
+
+        .description-class {
+            color: #333;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .date-class {
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Available Positions</h1>
+
+    <!-- Job Listing 1 -->
+    <div class="job-card">
+        <div class="flex-auto line-height-4">
+            <div class="company-name">TechCorp Industries</div>
+            <div class="truncate">Senior Software Engineer - Backend</div>
+        </div>
+        <span class="status-class status-active">Active</span>
+        <div class="domain-class">techcorp.com</div>
+        <div class="description-class">
+            We are seeking an experienced Senior Software Engineer to join our backend team.
+            You'll be working with Python, Go, and microservices architecture to build scalable
+            solutions for millions of users worldwide.
+        </div>
+        <div class="date-class">2025-10-18</div>
+    </div>
+
+    <!-- Job Listing 2 -->
+    <div class="job-card">
+        <div class="flex-auto line-height-4">
+            <div class="company-name">DataVision Analytics</div>
+            <div class="truncate">Machine Learning Engineer - Computer Vision</div>
+        </div>
+        <span class="status-class status-active">Active</span>
+        <div class="domain-class">datavision.io</div>
+        <div class="description-class">
+            Join our AI team to develop cutting-edge computer vision models. Experience with
+            PyTorch, TensorFlow, and deep learning required. Work on exciting projects in
+            autonomous systems and image recognition.
+        </div>
+        <div class="date-class">2025-10-18</div>
+    </div>
+
+    <!-- Job Listing 3 -->
+    <div class="job-card">
+        <div class="flex-auto line-height-4">
+            <div class="company-name">CloudScale Solutions</div>
+            <div class="truncate">DevOps Engineer - Infrastructure</div>
+        </div>
+        <span class="status-class status-pending">Pending Review</span>
+        <div class="domain-class">cloudscale.net</div>
+        <div class="description-class">
+            Looking for a DevOps engineer experienced in Kubernetes, Docker, and CI/CD pipelines.
+            You'll manage our cloud infrastructure and ensure high availability of our services.
+        </div>
+        <div class="date-class">2025-10-18</div>
+    </div>
+
+    <!-- Job Listing 4 -->
+    <div class="job-card">
+        <div class="flex-auto line-height-4">
+            <div class="company-name">FinTech Innovations</div>
+            <div class="truncate">Full Stack Developer - React & Node.js</div>
+        </div>
+        <span class="status-class status-closed">Closed</span>
+        <div class="domain-class">fintechinnovations.com</div>
+        <div class="description-class">
+            Build modern financial applications using React, Node.js, and PostgreSQL.
+            Experience with payment systems and security best practices is a plus.
+        </div>
+        <div class="date-class">2025-10-18</div>
+    </div>
+
+    <!-- Job Listing 5 -->
+    <div class="job-card">
+        <div class="flex-auto line-height-4">
+            <div class="company-name">Quantum Robotics</div>
+            <div class="truncate">Robotics Software Engineer - Autonomous Systems</div>
+        </div>
+        <span class="status-class status-active">Active</span>
+        <div class="domain-class">quantumrobotics.ai</div>
+        <div class="description-class">
+            Join our robotics team to develop control systems for autonomous robots.
+            Experience with ROS, C++, and sensor fusion required. Work on next-generation
+            warehouse automation systems.
+        </div>
+        <div class="date-class">2025-10-18</div>
+    </div>
+
+    <!-- Job Listing 6 -->
+    <div class="job-card">
+        <div class="flex-auto line-height-4">
+            <div class="company-name">GreenEnergy Tech</div>
+            <div class="truncate">IoT Engineer - Smart Grid Systems</div>
+        </div>
+        <span class="status-class status-active">Active</span>
+        <div class="domain-class">greenenergy.tech</div>
+        <div class="description-class">
+            Develop IoT solutions for smart energy management. Work with embedded systems,
+            MQTT, and real-time data processing. Help build sustainable energy infrastructure.
+        </div>
+        <div class="date-class">2025-10-18</div>
+    </div>
+
+</body>
+</html>

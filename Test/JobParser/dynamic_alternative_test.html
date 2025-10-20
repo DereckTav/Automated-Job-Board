@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Listings - Dynamic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .flex-auto {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+
+        .line-height-4 {
+            line-height: 1.6;
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-class {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .domain-class {
+            color: #0066cc;
+            font-size: 13px;
+            margin-top: 8px;
+            text-decoration: none;
+        }
+
+        .domain-class:hover {
+            text-decoration: underline;
+        }
+
+        .description-class {
+            color: #333;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .date-class {
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        #job-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Available Positions</h1>
+    <div id="loading">Loading job listings...</div>
+    <div id="job-container"></div>
+
+    <script>
+        // Simulate API data
+        const jobData = [
+            {
+                company: "FinTech Innovations",
+                position: "Full Stack Developer - React & Node.js",
+                status: "Closed",
+                statusClass: "status-closed",
+                domain: "fintechinnovations.com",
+                description: "Build modern financial applications using React, Node.js, and PostgreSQL. Experience with payment systems and security best practices is a plus.",
+                date: "2025-10-05"
+            },
+            {
+                company: "Quantum Robotics",
+                position: "Robotics Software Engineer - Autonomous Systems",
+                status: "Active",
+                statusClass: "status-active",
+                domain: "quantumrobotics.ai",
+                description: "Join our robotics team to develop control systems for autonomous robots. Experience with ROS, C++, and sensor fusion required. Work on next-generation warehouse automation systems.",
+                date: "2025-10-05"
+            },
+            {
+                company: "GreenEnergy Tech",
+                position: "IoT Engineer - Smart Grid Systems",
+                status: "Active",
+                statusClass: "status-active",
+                domain: "greenenergy.tech",
+                description: "Develop IoT solutions for smart energy management. Work with embedded systems, MQTT, and real-time data processing. Help build sustainable energy infrastructure.",
+                date: "2025-10-05"
+            }
+        ];
+
+        function createJobCard(job) {
+            return `
+                <div class="job-card">
+                    <div class="flex-auto line-height-4">
+                        <div class="company-name">${job.company}</div>
+                        <div class="truncate">${job.position}</div>
+                    </div>
+                    <span class="status-class ${job.statusClass}">${job.status}</span>
+                    <div class="domain-class">${job.domain}</div>
+                    <div class="description-class">${job.description}</div>
+                    <div class="date-class">${job.date}</div>
+                </div>
+            `;
+        }
+
+        // Simulate async data loading with delay
+        function loadJobs() {
+            setTimeout(() => {
+                const container = document.getElementById('job-container');
+                const loading = document.getElementById('loading');
+
+                const jobsHTML = jobData.map(job => createJobCard(job)).join('');
+                container.innerHTML = jobsHTML;
+
+                loading.style.display = 'none';
+                container.style.display = 'block';
+            }, 1500); // 1.5 second delay to simulate network request
+        }
+
+        // Load jobs when page loads
+        window.addEventListener('DOMContentLoaded', loadJobs);
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Logs
+*.log
+logs/
+log/
+
+# Testing
+.pytest_cache/
+
+# Environment and secret files
+.env
+.env.*
+*.env
+*.ini
+*.cfg
+*.json
+
+# Collection of Websites that are being parsed
+websites.yaml
