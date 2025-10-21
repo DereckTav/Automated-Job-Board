@@ -79,7 +79,14 @@ class StaticContentParser:
                 for key, selector in selectors.items():
                     elements = soup.select(selector)
                     if elements:
-                        extracted_data[key] = [elem.get_text(strip=True) for elem in elements]
+                        if key == "application_link":
+                            extracted_data[key] = [
+                                elem.get("href") if elem.has_attr("href")
+                                else elem.get_text(strip=True)
+                                for elem in elements
+                            ]
+                        else:
+                            extracted_data[key] = [elem.get_text(strip=True) for elem in elements]
                     await asyncio.sleep(0) #this should work assuming that there is another task in the cycle
             else:
                 return None
