@@ -85,7 +85,7 @@ python main.py
 
 Press `Ctrl+C` to stop
 
----
+
 ### Running 24/7 (Background Execution)
 
 ---
