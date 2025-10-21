@@ -19,7 +19,6 @@ log/
 
 # Environment and secret files
 .env
-.env.*
 *.env
 *.ini
 *.cfg

@@ -162,6 +162,8 @@ async def test_singleton_initialization_once(reset_singleton):
 
     assert parser2.tracker is original_tracker, "tracker should be same object"
 
+# remember to switch dates in test files to either today or yesterday
+
 #test parse
 @pytest.mark.asyncio
 async def test_parse(test_server, reset_singleton):

@@ -3,19 +3,26 @@
 #    - "JS"
 #    - "STATIC"
 
+# for relative dates use (e.g age: 0d or posted 0 Days ago etc...):
+#    - "-relative"
+
 websites:
   static-page:
     url: "http://localhost:8080/static"
-    base_url: "http://localhost:8080"
-    parser_type: "STATIC"
-    date_format: '%Y-%m-%d'
+    base_url: "http://localhost:8080" # needed for robots
+    parser_type: "STATIC" #what parser is req for link
+    date_format: '%Y-%m-%d' # always provide date_format
     selectors:
       company_name: "div.flex-auto.line-height-4"
+        # This is an example of a selector on a website
+        # It can either use css, or tags
+        # as you can see here this is chained
       position: "div.flex-auto.line-height-4 div.truncate"
       application_link: "div.domain-class"
       description: "div.description-class"
       date: "div.date-class"
       #      company_size: "something"
+      # comment out selectors that aren't provided.
 
   dynamic-page:
     url: "http://localhost:8080/dynamic"
@@ -31,11 +38,11 @@ websites:
       #      company_size: "something"
 
   Csv_table:
-    url: "http://localhost:8080/csv"
+    url: "http://localhost:8080/csv" # provided download link to csv
     accept: 'text/csv'
     date_format: '%Y-%m-%d'
     parser_type: "DOWNLOAD"
-    selectors:
+    selectors: # these are the column names
       company_name: "company_name"
       position: "position"
       application_link: "domain"
