@@ -34,7 +34,7 @@ Step-by-step instructions on how to get the project running locally:
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR-USERNAME/job-board-aggregator.git
+git clone https://github.com/DereckTav/Automated-Job-Board.git
 
 # Navigate to project directory
 cd job-board-aggregator
