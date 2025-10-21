@@ -24,5 +24,14 @@ log/
 *.cfg
 *.json
 
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+
 # Collection of Websites that are being parsed
 websites.yaml
