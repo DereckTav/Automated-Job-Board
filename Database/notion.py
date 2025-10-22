@@ -207,11 +207,11 @@ class NotionDatabase:
 
         except aiohttp.ClientResponseError as e:
             logging.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n "
-                          f"response:{json.dumps(response.json(), indent=4)}")
+                          f"response:{json.dumps(await response.json(), indent=4)}")
             return None
 
         except Exception:
-            logging.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(response.json(), indent=4)}")
+            logging.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(await response.json(), indent=4)}")
             return None
 
     async def _post(
@@ -227,11 +227,11 @@ class NotionDatabase:
 
         except aiohttp.ClientResponseError as e:
             logging.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n"
-                          f" response: {json.dumps(response.json(), indent=4)}")
+                          f" response: {json.dumps(await response.json(), indent=4)}")
             return
 
         except Exception:
-            logging.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(response.json(), indent=4)}")
+            logging.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(await response.json(), indent=4)}")
             return
 
     async def batch_post(self, *data: dict):
@@ -284,7 +284,7 @@ class NotionDatabase:
                 return (await response.json()).get("results", [])
 
         except Exception:
-            logging.error(f"Notion API error can't retrieve query : {json.dumps(response.json(), indent=4)}")
+            logging.error(f"Notion API error can't retrieve query : {json.dumps(await response.json(), indent=4)}")
             return None
 
     async def _query_database(self):
@@ -314,7 +314,7 @@ class NotionDatabase:
 
             return results
         except Exception:
-            logging.error(f"Notion API error can't retrieve query : {json.dumps(response.json(), indent=4)}")
+            logging.error(f"Notion API error can't retrieve query : {json.dumps(await response.json(), indent=4)}")
             return None
 
     async def _delete_page(self, page_id):
@@ -325,7 +325,7 @@ class NotionDatabase:
                 return await response.json()
 
         except Exception:
-            logging.error(f"Notion API error can't delete page : {json.dumps(response.json(), indent=4)}")
+            logging.error(f"Notion API error can't delete page : {json.dumps(await response.json(), indent=4)}")
             return None
 
     async def _delete_old_entries(self, days=2):

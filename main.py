@@ -1,6 +1,10 @@
 from WebsiteManager import Manager
 import asyncio
 
-if __name__ == "__main__":
+async def main():
     manager = Manager()
-    asyncio.run(manager.start())
+    await manager.start()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
