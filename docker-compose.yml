@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  Job-Board:
+  job-board:
     build: .
     restart: unless-stopped
     env_file:
