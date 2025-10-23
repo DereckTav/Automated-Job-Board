@@ -104,7 +104,14 @@ class JavaScriptContentParser(Parser):
                 for key, selector in selectors.items():
                     try:
                         elements = driver.find_elements(By.CSS_SELECTOR, selector)
-                        extracted_data[key] = [elem.text.strip() for elem in elements if elem.text.strip()]
+                        if key == "application_link":
+                            extracted_data[key] = [
+                                elem.get_attribute("href") or elem.text.strip()
+                                for elem in elements
+                            ]
+                        else:
+                            extracted_data[key] = [elem.text.strip() for elem in elements if elem.text.strip()]
+
                         await asyncio.sleep(0)  # this should work assuming that there is another task in the cycle
                     except Exception:
                         extracted_data[key] = []

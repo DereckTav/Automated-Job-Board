@@ -117,3 +117,6 @@ All parsers except `download_parser` use `-relative` to signify that
 the date that is being used is relative
 
 meaning download_parser doesn't work with relative dates
+
+Some sites may load content with react or JS, and for those sites I would recommend using `JS` in `websites.yaml`,
+becuase sometimes it has Unicode `\u003`, which breaks `STATIC` parser.
