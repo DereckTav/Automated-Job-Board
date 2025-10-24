@@ -4,7 +4,7 @@ from datetime import datetime
 from LocalData.tracker import WebTracker
 
 def keep_relevant(extracted_data: Dict, date_format: str, url: str, tracker: WebTracker):
-    df = pd.DataFrame(extracted_data)
+    df = pd.DataFrame.from_dict(extracted_data, orient='index').T
 
     if "-relative" in date_format:
         df['date'] = df['date'].str.extract(r'(\d+)').astype(int)
