@@ -2,7 +2,6 @@ import asyncio
 import atexit
 import json
 from datetime import datetime, timedelta, timezone
-import logging
 import os
 from typing import Optional, Dict, Any
 
@@ -26,25 +25,7 @@ QUERY_ENDPOINT = f"https://api.notion.com/v1/data_sources/{DATA_SOURCE_ID}/query
 
 TIMEOUT_2DAYS = 2 * 24 * 60 * 60  # 2 days
 
-from pathlib import Path
-
-# Get the directory where the current script lives
-base_dir = Path(__file__).resolve().parent
-
-# Create a logs directory if it doesn't exist
-logs_dir = base_dir / "logs"
-logs_dir.mkdir(exist_ok=True)
-
-# Full path to the log file
-log_file = logs_dir / "database.log"
-
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    filename=log_file,
-    filemode='a'
-)
+import logs.logger as log
 
 cleaner_active = False
 
@@ -88,7 +69,7 @@ async def cleanup():
         try:
             await notion.database_cleaner
         except asyncio.CancelledError:
-            logging.info("Cleaner task was cancelled")
+            log.info("Cleaner task was cancelled")
             pass
 
 def shutdown_handler():
@@ -201,17 +182,17 @@ class NotionDatabase:
         body = self._generate_body(company_name, position, url, job_description, company_size)
         try:
             async with self.session.post(self.api_endpoint, json=body, headers=self.headers) as response:
+                response_data = await response.json()
                 response.raise_for_status()
-
-                return await response.json()
+                return response_data
 
         except aiohttp.ClientResponseError as e:
-            logging.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n "
-                          f"response:{json.dumps(await response.json(), indent=4)}")
+            log.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n "
+                          f"response:{json.dumps(response_data, indent=4)}")
             return None
 
         except Exception:
-            logging.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(await response.json(), indent=4)}")
+            log.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(response_data, indent=4)}")
             return None
 
     async def _post(
@@ -222,16 +203,17 @@ class NotionDatabase:
 
         try:
             async with self.session.post(self.api_endpoint, json=body, headers=self.headers) as response:
+                response_data = await response.json()
                 response.raise_for_status()
                 return
 
         except aiohttp.ClientResponseError as e:
-            logging.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n"
-                          f" response: {json.dumps(await response.json(), indent=4)}")
+            log.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n"
+                          f" response: {json.dumps(response_data, indent=4)}")
             return
 
-        except Exception:
-            logging.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(await response.json(), indent=4)}")
+        except Exception as e:
+            log.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(response_data, indent=4)}")
             return
 
     async def batch_post(self, *data: dict):
@@ -280,11 +262,12 @@ class NotionDatabase:
     async def _query_database_2(self):
         try:
             async with self.session.post(self.query_endpoint, headers=self.headers) as response:
+                response_data = await response.json()
                 response.raise_for_status()
-                return (await response.json()).get("results", [])
+                return response_data.get("results", [])
 
         except Exception:
-            logging.error(f"Notion API error can't retrieve query : {json.dumps(await response.json(), indent=4)}")
+            log.error(f"Notion API error can't retrieve query : {json.dumps(response_data, indent=4)}")
             return None
 
     async def _query_database(self):
@@ -302,9 +285,9 @@ class NotionDatabase:
                     payload["start_cursor"] = start_cursor
 
                 async with self.session.post(self.query_endpoint, headers=self.headers, json=payload) as response:
-                    response.raise_for_status()
-
                     body = await response.json()
+
+                    response.raise_for_status()
 
                     results.extend(body.get("results", []))
                     has_more = body.get("has_more", False)
@@ -314,18 +297,19 @@ class NotionDatabase:
 
             return results
         except Exception:
-            logging.error(f"Notion API error can't retrieve query : {json.dumps(await response.json(), indent=4)}")
+            log.error(f"Notion API error can't retrieve query : {json.dumps(body, indent=4)}")
             return None
 
     async def _delete_page(self, page_id):
         url = self.api_endpoint + f"/{page_id}"
         try:
             async with self.session.patch(url, headers=self.headers, json={"archived": True}) as response:
+                response_data = await response.json()
                 response.raise_for_status()
-                return await response.json()
+                return response_data
 
         except Exception:
-            logging.error(f"Notion API error can't delete page : {json.dumps(await response.json(), indent=4)}")
+            log.error(f"Notion API error can't delete page : {json.dumps(response_data, indent=4)}")
             return None
 
     async def _delete_old_entries(self, days=2):
@@ -353,7 +337,7 @@ class NotionDatabase:
                 cleaner_active = True
                 await self._delete_old_entries()
         except asyncio.CancelledError:
-            logging.error("cleaner cancelled")
+            log.info("cleaner cancelled")
             raise
 
     async def clear_duplicates(self):
@@ -432,6 +416,7 @@ class MessageBus:
             self._initialized = True
 
     async def publish(self, result: Result):
+        log.info('postings are being published')
         if not Gateway.is_initialized():
             self.gateway = Gateway()
             asyncio.create_task(self.gateway.run())

@@ -1,29 +1,11 @@
 import asyncio
-import logging
+import logs.logger as log
 from urllib.robotparser import RobotFileParser
 
 from LocalData.cache import Cache
 from Robots.robots import RobotsRules
 from urllib.parse import urlparse
 
-from pathlib import Path
-
-# Get the directory where the current script lives
-base_dir = Path(__file__).resolve().parent
-
-# Create a logs directory if it doesn't exist
-logs_dir = base_dir / "logs"
-logs_dir.mkdir(exist_ok=True)
-
-# Full path to the log file
-log_file = logs_dir / "parser.log"
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    filename=log_file,
-    filemode='a'
-)
 
 class RobotsTxtParser:
     _instance = None
@@ -136,5 +118,5 @@ class RobotsTxtParser:
                     await asyncio.sleep(0)
 
         except asyncio.CancelledError:
-            logging.error("Cancelled robots refresher")
+            log.error("Cancelled robots refresher")
             raise

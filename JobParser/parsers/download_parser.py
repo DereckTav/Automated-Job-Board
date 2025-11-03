@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from datetime import datetime
 from io import StringIO
 
@@ -13,24 +12,8 @@ from JobParser.output import Result
 from typing import Optional
 from JobParser.parsers.generic_parser import Parser
 
-from pathlib import Path
-
-# Get the directory where the current script lives
-base_dir = Path(__file__).resolve().parent
-
-# Create a logs directory if it doesn't exist
-logs_dir = base_dir / "logs"
-logs_dir.mkdir(exist_ok=True)
-
-# Full path to the log file
-log_file = logs_dir / "parser.log"
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    filename=log_file,
-    filemode='a'
-)
+from JobParser.parsers.util import normalize_position
+import logs.logger as log
 
 class DownloadParser(Parser):
     _instance = None
@@ -64,7 +47,7 @@ class DownloadParser(Parser):
 
             return content
         except Exception as e:
-            logging.error(f"Error fetching : {url}: {e}")
+            log.error(f"(Download Parser) Error fetching : {url}: {e}")
 
     async def parse(self, config: dict) -> Optional[Result]:
         url = config['url']
@@ -86,6 +69,8 @@ class DownloadParser(Parser):
         today = pd.Timestamp(datetime.today().date())
         yesterday = today - pd.Timedelta(days=1)
         df_filtered = df[df[date].isin([today, yesterday])]
+
+        df_filtered = normalize_position(df_filtered)
 
         if df_filtered.empty:
             return None

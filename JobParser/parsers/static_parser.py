@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from typing import Optional
 
 from bs4 import BeautifulSoup
@@ -9,27 +8,9 @@ from Http.http_client import Session
 from LocalData.tracker import WebTracker
 from Robots.robots_parser import RobotsTxtParser
 from JobParser.output import Result
-from JobParser.parsers.util import keep_relevant
+from JobParser.parsers.util import keep_relevant, normalize_position
 
-from pathlib import Path
-
-# Get the directory where the current script lives
-base_dir = Path(__file__).resolve().parent
-
-# Create a logs directory if it doesn't exist
-logs_dir = base_dir / "logs"
-logs_dir.mkdir(exist_ok=True)
-
-# Full path to the log file
-log_file = logs_dir / "parser.log"
-
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    filename=log_file,
-    filemode='a'
-)
+import logs.logger as log
 
 class StaticContentParser:
     _instance = None
@@ -53,6 +34,8 @@ class StaticContentParser:
         date_format = config['date_format']
         selectors = config['selectors']
         ignore_filters = config.get('ignore', {})
+        identifier = f'static_parser({url})'
+        log.info(identifier)
 
         user_agent = self.ua.random
 
@@ -63,7 +46,7 @@ class StaticContentParser:
         try:
             rules = await RobotsTxtParser().get_rules(url, base_url, user_agent)
             if not rules.can_fetch:
-                logging.error(f"can not fetch {url}")
+                log.warning(f"static: can not fetch {url}")
                 return None
 
             await asyncio.sleep(rules.crawl_delay)
@@ -91,10 +74,16 @@ class StaticContentParser:
             else:
                 return None
 
+            log.info(f"{identifier}: extracted data")
+
             if not any(extracted_data.values()):
+                log.info(f'{identifier}: empty extracted data')
                 return None
 
             df = keep_relevant(extracted_data, date_format, url, self.tracker, ignore_filters)
+            df = normalize_position(df)
+
+            log.info(f"{identifier}: got relevant data")
 
             if df is None or df.empty:
                 return None
@@ -102,5 +91,5 @@ class StaticContentParser:
             return Result(**(df.to_dict(orient='list')))
 
         except Exception as e:
-            logging.error(f"Error parsing content from {url}: {e}")
+            log.error(f"Error parsing content from {url}: {e}")
             return None

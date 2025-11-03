@@ -15,11 +15,6 @@ def keep_relevant(
     if df.empty:
         return None
 
-        # Normalize text in all string columns to handle encoding issues
-        for col in df.columns:
-            if df[col].dtype == 'object':  # String columns
-                df[col] = df[col].apply(lambda x: normalize_text(x) if pd.notna(x) and x else x)
-
     for field in ['application_link', 'company_name', 'position']:
         df = df[df[field].notna() & (df[field].astype(str).str.strip() != '')]
 
@@ -89,3 +84,9 @@ def apply_ignore_filters(df: pd.DataFrame, ignore_filters: Dict[str, List[str]])
             break
 
     return filtered_df
+
+def normalize_position(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalize position values by removing commas that aren't allowed in Notion multi-select"""
+    if 'position' in df.columns:
+        df['position'] = df['position'].str.replace(",", " -", regex=False)
+    return df

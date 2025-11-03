@@ -13,6 +13,8 @@ from JobParser.parsers.generic_parser import Parser
 from Database.notion import NotionDatabase
 from Database.notion import MessageBus
 
+import logs.logger as log
+
 '''
 TYPES
     - "DOWNLOAD"
@@ -131,6 +133,7 @@ class Manager:
         sleep = False
         while self.running:
             if sleep:
+                log.info(f'SLEEPING: {config['url']}')
                 offset = random.randint(-45 * 60, 45 * 60)  # ±45 min
                 await asyncio.sleep(timeout + offset)
                 sleep = False
@@ -155,6 +158,7 @@ class Manager:
                     await asyncio.sleep(5 * 60) # 5 min (here time isn't important)
 
                 self.clearing_flag = True
+                log.info(f'CLEARING: duplicates')
                 await NotionDatabase().clear_duplicates()
                 self.clearing_flag = False
 
