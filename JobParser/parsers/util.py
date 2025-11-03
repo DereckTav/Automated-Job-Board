@@ -1,10 +1,34 @@
-from typing import Dict
+from typing import Dict, Optional, List
 import pandas as pd
 from datetime import datetime
 from LocalData.tracker import WebTracker
 
-def keep_relevant(extracted_data: Dict, date_format: str, url: str, tracker: WebTracker):
+def keep_relevant(
+        extracted_data: Dict,
+        date_format: str,
+        url: str,
+        tracker: WebTracker,
+        ignore_filters: Optional[Dict[str, List[str]]] = None
+) -> Optional[pd.DataFrame]:
     df = pd.DataFrame.from_dict(extracted_data, orient='index').T
+
+    if df.empty:
+        return None
+
+        # Normalize text in all string columns to handle encoding issues
+        for col in df.columns:
+            if df[col].dtype == 'object':  # String columns
+                df[col] = df[col].apply(lambda x: normalize_text(x) if pd.notna(x) and x else x)
+
+    for field in ['application_link', 'company_name', 'position']:
+        df = df[df[field].notna() & (df[field].astype(str).str.strip() != '')]
+
+    # Apply ignore filters
+    if ignore_filters:
+        df = apply_ignore_filters(df, ignore_filters)
+
+        if df.empty:
+            return None
 
     if "-relative" in date_format:
         df['date'] = df['date'].str.extract(r'(\d+)').astype(int)
@@ -37,3 +61,31 @@ def keep_relevant(extracted_data: Dict, date_format: str, url: str, tracker: Web
             final_df = df_filtered.loc[:match_idx - 1] if match_idx > 0 else pd.DataFrame(columns=df.columns)
 
     return final_df
+
+
+def apply_ignore_filters(df: pd.DataFrame, ignore_filters: Dict[str, List[str]]) -> pd.DataFrame:
+    filtered_df = df.copy()
+
+    for column, ignore_terms in ignore_filters.items():
+        if column not in filtered_df.columns:
+            continue
+
+        if not ignore_terms:
+            continue
+
+        # Create a boolean mask for rows to keep
+        # We'll mark rows as False (to remove) if they contain any ignore term
+        mask = pd.Series([True] * len(filtered_df), index=filtered_df.index)
+
+        for term in ignore_terms:
+            # Case-insensitive partial match
+            term_lower = str(term).lower()
+            column_mask = filtered_df[column].astype(str).str.lower().str.contains(term_lower, na=False)
+            mask = mask & ~column_mask
+
+        filtered_df = filtered_df[mask]
+
+        if filtered_df.empty:
+            break
+
+    return filtered_df

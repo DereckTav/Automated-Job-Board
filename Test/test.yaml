@@ -36,6 +36,13 @@ websites:
       description: "div.description-class"
       date: "div.date-class"
       #      company_size: "something"
+    ignore: # notice keys for ignore have the same names as the keys for selectors
+      position:
+        - "Graduate"
+        - "graduate"
+      application_link:
+        - "🔒"
+
 
   Csv_table:
     url: "http://localhost:8080/csv" # provided download link to csv

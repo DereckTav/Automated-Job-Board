@@ -78,6 +78,7 @@ class JavaScriptContentParser(Parser):
         base_url = config['base_url']
         date_format = config['date_format']
         selectors = config['selectors']
+        ignore_filters = config.get('ignore', {})  # Get ignore filters from config
 
         user_agent = self.ua.random
         chrome_options = self._setup_driver_options(user_agent)
@@ -121,7 +122,10 @@ class JavaScriptContentParser(Parser):
             if not any(extracted_data.values()):
                 return None
 
-            df = keep_relevant(extracted_data, date_format, url, self.tracker)
+            df = keep_relevant(extracted_data, date_format, url, self.tracker, ignore_filters)
+
+            if df is None or df.empty:
+                return None
 
             return Result(**(df.to_dict(orient='list')))
 

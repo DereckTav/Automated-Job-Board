@@ -52,6 +52,7 @@ class StaticContentParser:
         base_url = config['base_url']
         date_format = config['date_format']
         selectors = config['selectors']
+        ignore_filters = config.get('ignore', {})
 
         user_agent = self.ua.random
 
@@ -90,7 +91,13 @@ class StaticContentParser:
             else:
                 return None
 
-            df= keep_relevant(extracted_data, date_format, url, self.tracker)
+            if not any(extracted_data.values()):
+                return None
+
+            df = keep_relevant(extracted_data, date_format, url, self.tracker, ignore_filters)
+
+            if df is None or df.empty:
+                return None
 
             return Result(**(df.to_dict(orient='list')))
 
