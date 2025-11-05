@@ -42,7 +42,9 @@ websites:
         - "graduate"
       application_link:
         - "🔒"
-
+    regularize: # treating some chars as null
+      chars:   # the function in util, forward fills the nulls in a dataframe
+        - "↳"
 
   Csv_table:
     url: "http://localhost:8080/csv" # provided download link to csv

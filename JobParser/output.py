@@ -1,7 +1,10 @@
+from typing import Optional
+
 class Result:
     _fields = ['company_name', 'position', 'application_link', 'description', 'company_size']
 
-    def __init__(self, **kwargs):
+    def __init__(self, parser_type: Optional[str] = None, **kwargs):
+        self.parser_type = parser_type
         self.company_name = kwargs.get('company_name')
         self.position = kwargs.get('position')
         self.application_link = kwargs.get('application_link', [None] * len(self.company_name))

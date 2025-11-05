@@ -1,5 +1,6 @@
 from typing import Dict, Optional, List
 import pandas as pd
+import numpy as np
 from datetime import datetime
 from LocalData.tracker import WebTracker
 
@@ -12,7 +13,7 @@ def keep_relevant(
 ) -> Optional[pd.DataFrame]:
     df = pd.DataFrame.from_dict(extracted_data, orient='index').T
 
-    if df.empty:
+    if df is None or df.empty:
         return None
 
     for field in ['application_link', 'company_name', 'position']:
@@ -34,6 +35,9 @@ def keep_relevant(
         today = pd.Timestamp(datetime.today().date())
         yesterday = today - pd.Timedelta(days=1)
         df_filtered = df[df['date'].isin([today, yesterday])]
+
+    if df_filtered.empty:
+        return None
 
     hash_val = tracker.get(url)  # this was the first row of the dataframe from the most recent call before
     content_hash = str(df_filtered.iloc[0].tolist())  # This is the first row of the dataframe
@@ -85,8 +89,24 @@ def apply_ignore_filters(df: pd.DataFrame, ignore_filters: Dict[str, List[str]])
 
     return filtered_df
 
-def normalize_position(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalize position values by removing commas that aren't allowed in Notion multi-select"""
-    if 'position' in df.columns:
-        df['position'] = df['position'].str.replace(",", " -", regex=False)
+
+def normalize_position(df: pd.DataFrame, position: str) -> pd.DataFrame:
+    if df is None or df.empty:
+        return df
+
+    if position in df.columns:
+        df = df.copy()
+        df[position] = df[position].str.replace(",", " -", regex=False)
+
+    return df
+
+def regularize_name(df: pd.DataFrame, name: str, list_of_nans) -> pd.DataFrame:
+    if df is None or df.empty:
+        return df
+
+    for nan in list_of_nans:
+        df = df.copy()
+        df[name] = df[name].replace(nan, np.nan)
+        df[name] = df[name].ffill()
+
     return df

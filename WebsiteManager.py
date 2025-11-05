@@ -160,6 +160,7 @@ class Manager:
                 self.clearing_flag = True
                 log.info(f'CLEARING: duplicates')
                 await NotionDatabase().clear_duplicates()
+                log.info(f'FINISH CLEARING: duplicates')
                 self.clearing_flag = False
 
             offset = random.randint(-45 * 60, 45 * 60)  # ±45 min

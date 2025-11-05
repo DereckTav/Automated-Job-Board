@@ -11,7 +11,7 @@ from Robots.robots_parser import RobotsTxtParser
 from JobParser.output import Result
 
 from JobParser.parsers.generic_parser import Parser
-from JobParser.parsers.util import keep_relevant, normalize_position
+from JobParser.parsers.util import keep_relevant, normalize_position, regularize_name
 
 import logs.logger as log
 
@@ -71,15 +71,15 @@ class JavaScriptContentParser(Parser):
                 log.warning(f"JS: can not fetch {url}")
                 return None
 
-            driver = asyncio.to_thread(webdriver.Chrome, options=chrome_options)
+            driver_task = asyncio.create_task(asyncio.to_thread(webdriver.Chrome, options=chrome_options))
             await asyncio.sleep(rules.crawl_delay) # turn asyncio
 
-            driver = await driver
+            driver = await driver_task
 
-            driver.set_page_load_timeout(30)
+            driver.set_page_load_timeout(120)
             driver.get(url)
 
-            await asyncio.sleep(10) #content loads
+            await asyncio.sleep(25) #content loads
 
             extracted_data = {}
             if selectors:
@@ -107,14 +107,19 @@ class JavaScriptContentParser(Parser):
                 return None
 
             df = keep_relevant(extracted_data, date_format, url, self.tracker, ignore_filters)
-            df = normalize_position(df)
+            df = normalize_position(df, 'position')
+
+            list_of_nans = config.get('regularize', {}).get('chars', None)
+
+            if list_of_nans:
+                df = regularize_name(df, 'company_name', list_of_nans)
 
             log.info(f"{identifier}: got relevant data")
 
             if df is None or df.empty:
                 return None
 
-            return Result(**(df.to_dict(orient='list')))
+            return Result("jS_PARSER", **(df.to_dict(orient='list')))
 
         except Exception as e:
             log.error(f"Error parsing content from {url}: {e}")

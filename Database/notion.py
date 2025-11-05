@@ -1,6 +1,7 @@
 import asyncio
 import atexit
 import json
+import time
 from datetime import datetime, timedelta, timezone
 import os
 from typing import Optional, Dict, Any
@@ -196,8 +197,12 @@ class NotionDatabase:
             return None
 
     async def _post(
-            self, company_name: str, position: str,
-            url: Optional[str], job_description: Optional[str], company_size: Optional[str]
+            self, company_name: str,
+            position: str,
+            url: Optional[str],
+            job_description: Optional[str],
+            company_size: Optional[str],
+            parser_type: Optional[str] = None,
         ) -> Optional[dict]:
         body = self._generate_body(company_name, position, url, job_description, company_size)
 
@@ -208,56 +213,96 @@ class NotionDatabase:
                 return
 
         except aiohttp.ClientResponseError as e:
-            log.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n"
-                          f" response: {json.dumps(response_data, indent=4)}")
+            message = f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n"\
+                      f" response: {json.dumps(response_data, indent=4)}"
+            log.error(f"[[{parser_type}]]" + message if parser_type else message)
+
+            #retry
+            self.bus = MessageBus().publish(
+                Result(
+                    position=position,
+                    application_link=url,
+                    company_name=company_name,
+                    parser_type=parser_type,
+                    company_size=company_size,
+                    description=job_description
+                )
+            )
+
             return
 
         except Exception as e:
             log.error(f"Notion API error for {company_name}: {url} : exception {json.dumps(response_data, indent=4)}")
             return
 
-    async def batch_post(self, *data: dict):
+    async def batch_post(self, *data: dict, parser_type: Optional[str] = None) -> float:
         global cleaner_active
         if len(data) > 3:
             raise ValueError("Expected at most 3 dictionaries")
 
         if not cleaner_active:
-            for item in data:
-                asyncio.create_task(self._post(
+            start_time = time.time()
+
+            tasks = [
+                self._post(
                     company_name=item.get('company_name'),
                     position=item.get('position'),
                     url=item.get('application_link'),
                     job_description=item.get('description'),
-                    company_size=item.get('company_size'))
+                    company_size=item.get('company_size'),
+                    parser_type=parser_type
                 )
+                for item in data
+            ]
 
-            await asyncio.sleep(0)
+            await asyncio.gather(*tasks, return_exceptions=True)
 
             # call cycle (per second):
                 # 3 calls (then another) -> 3 calls -> repeat
 
-        if cleaner_active:
-            counter = 0
+            # Calculate remaining time to reach 1 second
+            elapsed = time.time() - start_time
+            remaining = max(0.0, 1.0 - elapsed)
+            return remaining
 
-            for item in data:
-                if counter == 2:
-                    await asyncio.sleep(1)
-
-                asyncio.create_task(self._post(
-                    company_name=item.get('company_name'),
-                    position=item.get('position'),
-                    url=item.get('application_link'),
-                    job_description=item.get('description'),
-                    company_size=item.get('company_size'))
+        else:
+            tasks = [
+                self._post(
+                    company_name=data[i].get('company_name'),
+                    position=data[i].get('position'),
+                    url=data[i].get('application_link'),
+                    job_description=data[i].get('description'),
+                    company_size=data[i].get('company_size'),
+                    parser_type=parser_type
                 )
-                counter += 1
+                for i in range(min(2, len(data)))
+            ]
 
-            await asyncio.sleep(0)
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+            await asyncio.sleep(1)
+
+            start_time = time.time()
+
+            # Send the 3rd one
+            if len(data) > 2:
+                asyncio.create_task(self._post(
+                    company_name=data[2].get('company_name'),
+                    position=data[2].get('position'),
+                    url=data[2].get('application_link'),
+                    job_description=data[2].get('description'),
+                    company_size=data[2].get('company_size'),
+                    parser_type=parser_type
+                ))
 
             #possible call cycles (per second):
                 # 2 calls (then another) -> 1 call -> repeat
                 # 3 calls (then another) -> 1 call -> repeat
                 # 2 calls (then another) -> 2 calls -> repeat
+
+            elapsed = time.time() - start_time
+            remaining = max(0.0, 1.0 - elapsed)
+            return remaining
 
     async def _query_database_2(self):
         try:
@@ -332,9 +377,11 @@ class NotionDatabase:
         try:
             while True:
                 cleaner_active = False
+                log.info(f"Cleaner active: {cleaner_active}")
                 await asyncio.sleep(TIMEOUT_2DAYS)
 
                 cleaner_active = True
+                log.info(f"Cleaner active: {cleaner_active}")
                 await self._delete_old_entries()
         except asyncio.CancelledError:
             log.info("cleaner cancelled")
@@ -424,7 +471,7 @@ class MessageBus:
             await self.gateway.ready().wait()
 
         for message in batch_zip(result.keys(), *result.values()):
-            self.queue.put_nowait(message)
+            self.queue.put_nowait((result.parser_type, message))
 
     async def subscribe(self): # each message is a tuple of 3 that can be done every second
         while True:
@@ -460,9 +507,9 @@ class Gateway:
 
         Gateway._ready.set()
 
-        async for message in self.bus:
-            asyncio.create_task(self.database.batch_post(*message))
-            await asyncio.sleep(1)
+        async for parser_type, message in self.bus:
+            remaining_time = await self.database.batch_post(*message, parser_type=parser_type)
+            await asyncio.sleep(remaining_time)
 
     def ready(self):
         return self._ready

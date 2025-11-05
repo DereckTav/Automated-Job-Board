@@ -12,7 +12,7 @@ from JobParser.output import Result
 from typing import Optional
 from JobParser.parsers.generic_parser import Parser
 
-from JobParser.parsers.util import normalize_position
+from JobParser.parsers.util import normalize_position, regularize_name
 import logs.logger as log
 
 class DownloadParser(Parser):
@@ -54,8 +54,9 @@ class DownloadParser(Parser):
         accept = config['accept']
         date_format = config['date_format']
         selectors = config['selectors']
-
+        log.info(f"Download_Parser ({url[:75]}...)")
         if not selectors:
+            log.info("No selectors selected")
             return None
 
         date = selectors['date']
@@ -70,7 +71,12 @@ class DownloadParser(Parser):
         yesterday = today - pd.Timedelta(days=1)
         df_filtered = df[df[date].isin([today, yesterday])]
 
-        df_filtered = normalize_position(df_filtered)
+        df_filtered = normalize_position(df_filtered, selectors['position'])
+
+        list_of_nans = config.get('regularize', {}).get('chars', None)
+
+        if list_of_nans:
+            df = regularize_name(df, selectors['company_name'], list_of_nans)
 
         if df_filtered.empty:
             return None
@@ -85,6 +91,7 @@ class DownloadParser(Parser):
             final_df = df_filtered
 
         elif hash_val == content_hash: # Nothing changed in data
+            log.info(f"Download_Parser ({url[:75]}...): empty")
             return None
 
         else: # Something changed, figure out what's new
@@ -96,6 +103,8 @@ class DownloadParser(Parser):
                 match_idx = match_mask.idxmax()
                 final_df = df_filtered.loc[:match_idx - 1] if match_idx > 0 else pd.DataFrame(columns=df.columns)
 
+        log.info(f"Download_Parser ({url[:75]}...): got relevant data")
+
         extracted_data = {}
 
         for key, selector in selectors.items():
@@ -105,4 +114,6 @@ class DownloadParser(Parser):
                 # It's time for you to go lol
                 extracted_data[key] = final_df[selector].astype(str).tolist()
 
-        return Result(**extracted_data)
+        log.info(f"Download_Parser ({url[:75]}...): extracted data")
+
+        return Result("DOWNLOAD_PARSER",**extracted_data)
