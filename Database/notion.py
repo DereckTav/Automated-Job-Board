@@ -217,8 +217,7 @@ class NotionDatabase:
                       f" response: {json.dumps(response_data, indent=4)}"
             log.error(f"[[{parser_type}]]" + message if parser_type else message)
 
-            #retry
-            self.bus = MessageBus().publish(
+            await MessageBus().publish(
                 Result(
                     position=position,
                     application_link=url,
