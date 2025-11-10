@@ -9,7 +9,7 @@ from typing import Optional, Dict, Any
 from Database.util import batch_zip
 
 import aiohttp
-from Http.http_client import Session
+from net.http_client import Session
 from parsers.output import Result
 
 from dotenv import load_dotenv
@@ -92,7 +92,7 @@ class NotionDatabase:
         if not self._initialized:
             self.headers = {
                "Authorization": f"Bearer {NOTION_API_KEY}",
-               "Content-Type": "application/json",
+               "Content-Type": "processing/json",
                "Notion-Version": "2025-09-03"
             }
 

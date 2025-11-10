@@ -5,7 +5,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import time
 
 from JobParser.parsers.static_parser import StaticContentParser
-from Http.http_client import Session
+from net.http_client import Session
 from processing.tracker import WebTracker
 
 from contextlib import contextmanager

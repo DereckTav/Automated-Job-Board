@@ -1,6 +1,7 @@
 from typing import List
 
 from base_parser import ParserDependencies
+from interfaces.content import ContentFetcher
 from parser_types import DownloadParser, StaticContentParser, JavaScriptContentParser, SeleniumDownloadParser
 from processing.data_processor import ChangeDetectionProcessor, NameRegularizationProcessor, PositionNormalizationProcessor, \
     DateFilterProcessor, IgnoreDataWithFlagProcessor, ColumnRegularizationProcessor
@@ -108,6 +109,7 @@ class ParserFactory:
 
     def create_selenium_download_parser(
             self,
+            fetcher: ContentFetcher = None,
             processors: List[DataProcessor] = None
     ) -> SeleniumDownloadParser:
         """
@@ -117,7 +119,8 @@ class ParserFactory:
         from Airtable, then processes them like DownloadParser.
         """
         # Create Airtable-specific fetcher
-        fetcher = AirtableSeleniumFetcher(self.browser_manager)
+        if fetcher is None:
+            fetcher = AirtableSeleniumFetcher(self.browser_manager)
 
         if processors is None:
             processors = [

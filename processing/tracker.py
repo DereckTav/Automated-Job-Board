@@ -1,5 +1,8 @@
 from interfaces.tracker import ChangeTracker
 
+'''
+trackes most recent seen job
+'''
 class Tracker(ChangeTracker):
     def __init__(self):
         self._tracker = {}

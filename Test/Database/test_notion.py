@@ -23,7 +23,7 @@ QUERY_ENDPOINT = f"https://api.notion.com/v1/data_sources/{DATA_SOURCE_ID}/query
 
 headers = {
         "Authorization": f"Bearer {NOTION_API_KEY}",
-        "Content-Type": "application/json",
+        "Content-Type": "processing/json",
         "Notion-Version": "2025-09-03"
     }
 
@@ -309,7 +309,7 @@ async def test_post_success_4(reset_singleton):
 
     assert page["properties"]["Company Name"]["title"][0]["text"]["content"] == "Company"
     assert page["properties"]["Position"]["multi_select"][0]["name"] == "Engineer"
-    assert page["properties"]["Application Link"]["url"] is None, "Expected no application link to be empty"
+    assert page["properties"]["Application Link"]["url"] is None, "Expected no processing link to be empty"
     assert description is None, "Expected no description"
     assert page["properties"]["Company Size"]["multi_select"] == [], "Expected 'Company Size' to be empty"
 

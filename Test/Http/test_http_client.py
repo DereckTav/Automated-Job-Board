@@ -1,5 +1,5 @@
 import pytest
-from Http.http_client import Session
+from net.http_client import Session
 # check if singleton
 
 # check if session is up (so on)

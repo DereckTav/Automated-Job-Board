@@ -3,6 +3,7 @@ import asyncio
 
 async def main():
     manager = Manager()
+    manager.set_global_instance(manager) # for clean up
     await manager.start()
 
 
