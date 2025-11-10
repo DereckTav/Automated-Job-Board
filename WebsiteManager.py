@@ -201,7 +201,7 @@ class Manager:
 
     async def test_process(self, parser, config, timeout):
         """
-        Test processing loop (no duplicate clearing).
+        test processing loop (no duplicate clearing).
         """
         sleep = False
         while self.running:

@@ -1,5 +1,5 @@
 from interfaces.robots import RobotsCache
-from output import RobotsRules
+from robots.output import RobotsRules
 from typing import Optional, List
 
 class InMemoryRobotsCache(RobotsCache):

@@ -39,14 +39,13 @@ class BaseParser(ABC):
         """
         Main parsing flow - same for all parsers!
         """
-        url = config['url']
         selectors = config['selectors']
 
         if not selectors:
             return None
 
         # Step 1: Fetch content (strategy depends on injected fetcher)
-        content = await self.fetcher.fetch(url, **config)
+        content = await self.fetcher.fetch(**config)
         if not content:
             return None
 
@@ -65,5 +64,5 @@ class BaseParser(ABC):
             return None
 
         # Step 5: Return result
-        from output import Result
+        from parsers.output import Result
         return Result(self.parser_type, **(df.to_dict(orient='list')))

@@ -1,4 +1,5 @@
 import asyncio
+import atexit
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -29,6 +30,13 @@ class RobotsCacheRefresher:
         if self._task and not self._task.done():
             self._task.cancel()
 
+    @classmethod
+    def set_global_instance(cls, instance):
+        """Set the global manager instance for cleanup."""
+        global _refresh_instance
+        _refresh_instance = instance
+
+
     async def _refresh_loop(self):
         """
         Background task that periodically refreshes cached rules.
@@ -40,7 +48,7 @@ class RobotsCacheRefresher:
 
         except asyncio.CancelledError:
             import logs.logger as log
-            log.info("Robots cache refresher stopped")
+            log.info("robots cache refresher stopped")
             raise
 
     async def _refresh_cache(self):
@@ -82,3 +90,25 @@ class RobotsCacheRefresher:
 
         except Exception:
             return False
+
+_refresh_instance = None
+
+async def cleanup():
+    """Cleanup on shutdown"""
+    if _refresh_instance:
+        await _refresh_instance.stop()
+
+        try:
+            await _refresh_instance._task
+        except asyncio.CancelledError:
+            pass
+
+
+def shutdown_handler():
+    """Handle shutdown gracefully"""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(cleanup())
+    loop.close()
+
+atexit.register(shutdown_handler)

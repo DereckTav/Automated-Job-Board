@@ -137,7 +137,7 @@ async def test_singleton_2(reset_singleton):
 
     assert db1 is db2
 
-# Notion Database
+# Notion database
 def test_generate_body():
     body = NotionDatabase._generate_body(
         "Company",
@@ -176,7 +176,7 @@ async def test_query_database(reset_singleton):
     await do_response_patch(url, body)
 
 
-#Test deletion
+#test deletion
 @pytest.mark.asyncio
 async def test_delete_page(reset_singleton):
     #add page
@@ -196,7 +196,7 @@ async def test_delete_page(reset_singleton):
     else:
         assert pages[0]["id"] != re_pages[0]["id"], "expected page to be deleted, page was not deleted"
 
-#Test Post
+#test Post
 @pytest.mark.asyncio
 async def test_post_success_1(reset_singleton):
     db = NotionDatabase()

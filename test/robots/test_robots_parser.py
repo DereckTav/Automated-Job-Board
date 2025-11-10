@@ -5,8 +5,11 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from unittest.mock import patch
 import time
 
-from src.Robots.robots_parser import RobotsTxtParser
-from src.Robots.robots import RobotsRules
+from robots.parser import RobotsTxtParser
+from robots.output import RobotsRules
+from robots.cache import InMemoryRobotsCache
+from robots.refresher import RobotsCacheRefresher
+
 
 # Mock HTTP Server for testing
 class MockRobotsHandler(BaseHTTPRequestHandler):
@@ -39,7 +42,7 @@ Crawl-delay: 5
 
 
 class TestServer:
-    """Test server context manager"""
+    """test server context manager"""
 
     def __init__(self, port=8080):
         self.port = port
@@ -64,54 +67,18 @@ class TestServer:
     def base_url(self):
         return f'http://localhost:{self.port}'
 
-
-# Test fixtures
-@pytest.fixture
-def reset_singleton():
-    """Reset the singleton between tests"""
-    RobotsTxtParser._instance = None
-    if hasattr(RobotsTxtParser, '_initialized'):
-        delattr(RobotsTxtParser, '_initialized')
-
-    yield
-
-    # Reset again after test
-    RobotsTxtParser._instance = None
-    if hasattr(RobotsTxtParser, '_initialized'):
-        delattr(RobotsTxtParser, '_initialized')
-
 @pytest.fixture
 def test_server():
     """Provide a test HTTP server"""
     with TestServer() as server:
         yield server
 
-
-# Singleton Tests
-@pytest.mark.asyncio
-async def test_singleton_same_instance(reset_singleton):
-    """Test that RobotsTxtParser maintains singleton pattern"""
-    parser1 = RobotsTxtParser()
-    parser2 = RobotsTxtParser()
-
-    assert parser1 is parser2, "Should return same instance"
-
-@pytest.mark.asyncio
-async def test_singleton_initialization_once(reset_singleton):
-    """Test that __init__ only runs once"""
-    parser1 = RobotsTxtParser()
-    original_cache = parser1._cache
-
-    parser2 = RobotsTxtParser()
-
-    assert parser2._cache is original_cache, "Cache should be same object"
-
-
 # get_rules Tests
 @pytest.mark.asyncio
 async def test_get_rules_allowed_url(test_server):
-    """Test get_rules for an allowed URL"""
-    parser = RobotsTxtParser()
+    """test get_rules for an allowed URL"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     url = f"{test_server.base_url}/allowed-page"
     rules = await parser.get_rules(url, test_server.base_url, "TestBot/1.0")
@@ -123,8 +90,9 @@ async def test_get_rules_allowed_url(test_server):
 
 @pytest.mark.asyncio
 async def test_get_rules_disallowed_url(test_server):
-    """Test get_rules for a disallowed URL"""
-    parser = RobotsTxtParser()
+    """test get_rules for a disallowed URL"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     url = f"{test_server.base_url}/blocked/page"
     rules = await parser.get_rules(url, test_server.base_url, "TestBot/1.0")
@@ -134,8 +102,9 @@ async def test_get_rules_disallowed_url(test_server):
 
 @pytest.mark.asyncio
 async def test_get_rules_base_url_with_slash(test_server):
-    """Test get_rules with base_url ending in slash"""
-    parser = RobotsTxtParser()
+    """test get_rules with base_url ending in slash"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     url = f"{test_server.base_url}/allowed-page"
     base_url_with_slash = test_server.base_url + "/"
@@ -147,8 +116,9 @@ async def test_get_rules_base_url_with_slash(test_server):
 
 @pytest.mark.asyncio
 async def test_get_rules_caching(test_server):
-    """Test that rules are cached after first fetch"""
-    parser = RobotsTxtParser()
+    """test that rules are cached after first fetch"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     url = f"{test_server.base_url}/allowed-page"
 
@@ -164,8 +134,9 @@ async def test_get_rules_caching(test_server):
 
 @pytest.mark.asyncio
 async def test_get_rules_exception_handling():
-    """Test get_rules returns default rules on exception"""
-    parser = RobotsTxtParser()
+    """test get_rules returns default rules on exception"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     # Use invalid URL to trigger exception
     url = "http://invalid-domain-that-does-not-exist-12345.com/page"
@@ -178,106 +149,103 @@ async def test_get_rules_exception_handling():
 # _check Tests
 @pytest.mark.asyncio
 async def test_check_valid_url(test_server):
-    """Test _check with valid URL"""
-    parser = RobotsTxtParser()
+    """test _check with valid URL"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     url = f"{test_server.base_url}/allowed-page"
-    result = await parser._check(url, "TestBot/1.0")
+    result = await RobotsCacheRefresher(parser, cache)._validate_url(url, "TestBot/1.0")
 
     assert result is True, "Should return True for allowed URL"
 
 
 @pytest.mark.asyncio
 async def test_check_blocked_url(test_server):
-    """Test _check with blocked URL"""
-    parser = RobotsTxtParser()
+    """test _check with blocked URL"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     url = f"{test_server.base_url}/blocked/page"
-    result = await parser._check(url, "TestBot/1.0")
+    result = await RobotsCacheRefresher(parser, cache)._validate_url(url, "TestBot/1.0")
 
     assert result is False, "Should return False for blocked URL"
 
 
 @pytest.mark.asyncio
 async def test_check_invalid_url():
-    """Test _check with invalid URL"""
-    parser = RobotsTxtParser()
+    """test _check with invalid URL"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     url = "http://invalid-domain-12345.com/page"
-    result = await parser._check(url, "TestBot/1.0")
+    result = await RobotsCacheRefresher(parser, cache)._validate_url(url, "TestBot/1.0")
 
     assert result is False, "Should return False on exception"
-
-
-@pytest.mark.asyncio
-async def test_check_caches_valid_urls(test_server):
-    """Test that _check caches valid URLs"""
-    parser = RobotsTxtParser()
-
-    url = f"{test_server.base_url}/allowed-page"
-    await parser._check(url, "TestBot/1.0")
-
-    # Check if URL is in cache
-    assert parser._cache.has(url), "Valid URL should be cached"
-
 
 # _refresh Tests
 @pytest.mark.asyncio
 async def test_refresh_removes_invalid_urls():
-    """Test that _refresh removes invalid URLs from cache"""
-    parser = RobotsTxtParser()
+    """test that _refresh removes invalid URLs from cache"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
 
     # Manually add invalid URL to cache
     invalid_url = "http://invalid-domain-12345.com/page"
-    parser._cache.cache(invalid_url, RobotsRules(True, 1.0, "TestBot/1.0"))
+    cache.set(invalid_url, RobotsRules(True, 1.0, "TestBot/1.0"))
 
-    assert parser._cache.has(invalid_url), "URL should be in cache initially"
+    assert cache.has(invalid_url), "URL should be in cache initially"
 
-    # Mock the _check method to return False
-    with patch.object(parser, '_check', return_value=False):
-        # Manually trigger refresh logic (just one iteration)
-        urls_to_remove = []
-        for url in list(parser._cache.keys()):
-            valid = await parser._check(url)
-            if not valid:
-                urls_to_remove.append(url)
+    # Manually trigger refresh logic (just one iteration)
+    urls_to_remove = []
+    for url in list(cache.get_all_urls()):
+        valid = await RobotsCacheRefresher(parser, cache)._validate_url(url, "TestBot/1.0")
+        if not valid:
+            urls_to_remove.append(url)
 
-        for url in urls_to_remove:
-            parser._cache.pop(url)
+    for url in urls_to_remove:
+        cache.remove(url)
 
-    assert not parser._cache.has(invalid_url), "Invalid URL should be removed"
+    assert not cache.has(invalid_url), "Invalid URL should be removed"
 
 
 @pytest.mark.asyncio
 async def test_refresh_task_created():
-    """Test that refresh task is created on initialization"""
-    parser = RobotsTxtParser()
+    """test that refresh task is created on initialization"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
+    refresh = RobotsCacheRefresher(parser, cache)
+    refresh.start()
 
-    assert parser._robots_refresher is not None, "Refresh task should be created"
-    assert isinstance(parser._robots_refresher, asyncio.Task), "Should be an asyncio Task"
+    assert refresh._task is not None, "Refresh task should be created"
+    assert isinstance(refresh._task, asyncio.Task), "Should be an asyncio Task"
 
 
 @pytest.mark.asyncio
 async def test_refresh_cancellation():
-    """Test that refresh task can be cancelled"""
-    parser = RobotsTxtParser()
+    """test that refresh task can be cancelled"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
+    refresh = RobotsCacheRefresher(parser, cache)
+    refresh.start()
 
     # Cancel the refresh task
-    parser._robots_refresher.cancel()
+    refresh.stop()
 
     try:
-        await parser._robots_refresher
+        await refresh._task
     except asyncio.CancelledError:
         pass  # Expected
 
-    assert parser._robots_refresher.cancelled(), "Task should be cancelled"
+    assert refresh._task.cancelled(), "Task should be cancelled"
 
 
 # Integration Tests
 @pytest.mark.asyncio
 async def test_full_workflow(test_server):
-    """Test complete workflow: get_rules, caching, and checking"""
-    parser = RobotsTxtParser()
+    """test complete workflow: get_rules, caching, and checking"""
+    cache = InMemoryRobotsCache()
+    parser = RobotsTxtParser(cache)
+    refresh = RobotsCacheRefresher(parser, cache)
 
     url = f"{test_server.base_url}/allowed-page"
 
@@ -286,11 +254,11 @@ async def test_full_workflow(test_server):
     assert rules.can_fetch is True
 
     # Check URL
-    can_fetch = await parser._check(url, "TestBot/1.0")
+    can_fetch = await refresh._validate_url(url, "TestBot/1.0")
     assert can_fetch is True
 
     # Verify caching
-    assert parser._cache.has(url)
+    assert cache.has(url)
 
 
 # Run tests

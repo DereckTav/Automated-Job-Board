@@ -1,7 +1,7 @@
 import asyncio
 from urllib.robotparser import RobotFileParser
 
-from output import RobotsRules
+from robots.output import RobotsRules
 from interfaces.robots import RobotsParser, RobotsCache
 
 

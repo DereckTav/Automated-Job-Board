@@ -6,11 +6,11 @@ import pytest
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import time
 
-from Database.notion import Gateway, NotionDatabase, MessageBus
+from database.notion import Gateway, NotionDatabase, MessageBus
 from Http.http_client import Session
-from JobParser.parsers.download_parser import DownloadParser
-from JobParser.parsers.js_parser import JavaScriptContentParser
-from JobParser.parsers.static_parser import StaticContentParser
+from jobparser.parsers.download_parser import DownloadParser
+from jobparser.parsers.js_parser import JavaScriptContentParser
+from jobparser.parsers.static_parser import StaticContentParser
 from processing.tracker import WebTracker
 from LocalData.test_cache import Cache
 from WebsiteManager import Manager
@@ -48,7 +48,7 @@ Crawl-delay: 1
             self.wfile.write(robots_content.encode())
 
         elif self.path == '/csv':
-            with open("Test/JobParser/data.csv", "r", encoding="utf-8") as f:
+            with open("test/jobparser/data.csv", "r", encoding="utf-8") as f:
                 html_content = f.read()
 
             self.send_response(200)
@@ -57,7 +57,7 @@ Crawl-delay: 1
             self.wfile.write(html_content.encode("utf-8"))
 
         elif self.path == '/static':
-            with open("Test/JobParser/test.html", "r", encoding="utf-8") as f:
+            with open("test/jobparser/test.html", "r", encoding="utf-8") as f:
                 html_content = f.read()
 
             self.send_response(200)
@@ -66,7 +66,7 @@ Crawl-delay: 1
             self.wfile.write(html_content.encode("utf-8"))
 
         elif self.path == '/dynamic':
-            with open("Test/JobParser/dynamic_test.html", "r", encoding="utf-8") as f:
+            with open("test/jobparser/dynamic_test.html", "r", encoding="utf-8") as f:
                 html_content = f.read()
 
             self.send_response(200)
@@ -132,7 +132,7 @@ async def test_manger(reset_singleton, test_server):
             if hasattr(cls, "_initialized"):
                 delattr(cls, "_initialized")
 
-        manager = Manager("C:/Users/ds3/PycharmProjects/PythonProject/Test/test.yaml", True)
+        manager = Manager("/test/test.yaml", True)
         await manager.start()
 
         while not await manager.is_idle():

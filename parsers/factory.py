@@ -1,8 +1,8 @@
 from typing import List
 
-from base_parser import ParserDependencies
+from parsers.base_parser import ParserDependencies
 from interfaces.content import ContentFetcher
-from parser_types import DownloadParser, StaticContentParser, JavaScriptContentParser, SeleniumDownloadParser
+from parsers.parser_types import DownloadParser, StaticContentParser, JavaScriptContentParser, SeleniumDownloadParser
 from processing.data_processor import ChangeDetectionProcessor, NameRegularizationProcessor, PositionNormalizationProcessor, \
     DateFilterProcessor, IgnoreDataWithFlagProcessor, ColumnRegularizationProcessor
 from processing.fetchers import HttpContentFetcher, SeleniumContentFetcher, DownloadFetcher, AirtableSeleniumFetcher
@@ -37,6 +37,7 @@ class ParserFactory:
                 refresh_interval_hours=24
             )
             self.robots_refresher.start()
+            self.robots_refresher.set_global_instance(self.robots_refresher) # for auto clean up
 
     def create_download_parser(self, processors: List[DataProcessor] = None) -> DownloadParser:
         """

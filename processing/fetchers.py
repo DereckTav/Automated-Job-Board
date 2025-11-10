@@ -31,14 +31,14 @@ class HttpContentFetcher(ContentFetcher):
         self.robots_parser = robots_parser
 
     async def fetch(self, url: str, **kwargs) -> Optional[Any]:
-        can_parse = await respect_robots(kwargs.get('base_url'), url, self.ua_provider.get_random(), self.robots_parser)
+        can_parse = await respect_robots(kwargs.get('base_url'), url, self.ua_provider.random, self.robots_parser)
 
         if not can_parse:
             return None
 
         accept = kwargs.get('accept', 'text/html')
         headers = {
-            "User-Agent": self.ua_provider.get_random(),
+            "User-Agent": self.ua_provider.random,
             "Accept": accept
         }
 
@@ -62,7 +62,7 @@ class SeleniumContentFetcher(ContentFetcher):
         self.ua_provider = user_agent_provider
 
     async def fetch(self, url: str, **kwargs) -> Optional[Any]:
-        can_parse = await respect_robots(kwargs.get('base_url'), url, self.ua_provider.get_random(), self.robots_parser)
+        can_parse = await respect_robots(kwargs.get('base_url'), url, self.ua_provider.random, self.robots_parser)
 
         if not can_parse:
             return None
@@ -92,7 +92,7 @@ class DownloadFetcher(ContentFetcher):
     async def fetch(self, url: str, **kwargs) -> Optional[Any]:
         accept = kwargs.get('accept', 'text/csv')
         headers = {
-            "User-Agent": self.ua_provider.get_random(),
+            "User-Agent": self.ua_provider.random,
             "Accept": accept
         }
 

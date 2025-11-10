@@ -1,5 +1,5 @@
 from io import StringIO
-from base_parser import BaseParser, ParserDependencies
+from parsers.base_parser import BaseParser, ParserDependencies
 from typing import Dict, List, Any
 import asyncio
 import pandas as pd
@@ -18,7 +18,7 @@ class DownloadParser(BaseParser):
     async def _extract_data(self, content: Any, selectors: Dict[str, str]) -> Dict[str, List[str]]:
         df = await asyncio.to_thread(pd.read_csv, StringIO(content))
 
-        return df.to_dict(orient='records')
+        return df.to_dict(orient='list')
 
 
 class StaticContentParser(BaseParser):

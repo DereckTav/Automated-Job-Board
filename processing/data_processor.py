@@ -100,7 +100,7 @@ class PositionNormalizationProcessor(DataProcessor):
         return parser_type not in self.exclude
 
     async def process(self, df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame:
-        from util import normalize_position
+        from processing.util import normalize_position
         position_col = config['selectors'].get('position', 'position')
         return normalize_position(df, position_col)
 
@@ -120,7 +120,7 @@ class NameRegularizationProcessor(DataProcessor):
         return parser_type not in self.exclude
 
     async def process(self, df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame:
-        from util import regularize_name
+        from processing.util import regularize_name
 
         list_of_nans = config.get('regularize', {}).get('chars', None)
         if not list_of_nans:

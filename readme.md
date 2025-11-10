@@ -66,7 +66,7 @@ Before running the script, ensure `websites.yaml` is created and properly config
 
 create file called `websites.yaml` at root
 
-[test.yaml](Test/test.yaml) provides a basic example of how to set up websites.yaml
+[test.yaml](test/test.yaml) provides a basic example of how to set up websites.yaml
 
 `websites.yaml` contains the necessary configuration for job boards and their parsing instructions.
 
