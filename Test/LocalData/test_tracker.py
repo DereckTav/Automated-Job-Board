@@ -1,4 +1,4 @@
-from LocalData.tracker import WebTracker
+from processing.tracker import WebTracker
 
 def test_singleton():
     tracker1 = WebTracker()

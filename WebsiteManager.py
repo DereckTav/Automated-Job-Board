@@ -8,6 +8,7 @@ import sys
 from JobParser.parsers.js_parser import JavaScriptContentParser
 from JobParser.parsers.static_parser import StaticContentParser
 from JobParser.parsers.download_parser import DownloadParser
+from JobParser.parsers.browser_download_parser import SeleniumDownloader
 from JobParser.parsers.generic_parser import Parser
 
 from Database.notion import NotionDatabase
@@ -40,12 +41,12 @@ def verify(websites: dict):
             print(f"Warning: No parser_type found for {website_name}")
             sys.exit()
 
-        if website_config.get('parser_type').upper() != 'DOWNLOAD':
+        if website_config.get('parser_type').upper() not in ['DOWNLOAD', 'BROWSER_DOWNLOAD']:
             if not website_config.get('base_url'):
                 print(f"Warning: No base_url found for {website_name}")
                 sys.exit()
 
-        if website_config.get('parser_type').upper() == 'DOWNLOAD':
+        if website_config.get('parser_type').upper() in ['DOWNLOAD', 'BROWSER_DOWNLOAD']:
             if not website_config.get('accept'):
                 print(f"Warning: No accept found for {website_name}")
                 sys.exit()
@@ -75,6 +76,7 @@ class Manager:
             self.static_parser = StaticContentParser()
             self.js_parser = JavaScriptContentParser()
             self.downloader = DownloadParser()
+            self.sel_downloader = SeleniumDownloader()
 
             self.active_count = 0
             self._initialized = True
@@ -107,7 +109,11 @@ class Manager:
 
             elif parser_type == 'DOWNLOAD':
                 parser = self.downloader
-                timeout = TIMEOUT_3HOURS
+                timeout = TIMEOUT_24HOURS
+
+            elif parser_type == 'BROWSER_DOWNLOAD':
+                parser = self.sel_downloader
+                timeout = TIMEOUT_24HOURS
 
             else:
                 continue

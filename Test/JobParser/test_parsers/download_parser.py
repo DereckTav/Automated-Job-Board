@@ -8,7 +8,7 @@ import time
 
 from JobParser.parsers.download_parser import DownloadParser
 from JobParser.output import Result
-from LocalData.tracker import WebTracker
+from processing.tracker import WebTracker
 from Http.http_client import Session
 
 from contextlib import contextmanager

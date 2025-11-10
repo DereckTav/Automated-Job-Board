@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-@dataclass
+
+@dataclass(frozen=True)
 class RobotsRules:
     can_fetch: bool
     crawl_delay: float

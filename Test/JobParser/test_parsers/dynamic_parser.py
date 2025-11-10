@@ -4,7 +4,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import time
 
 from JobParser.parsers.js_parser import JavaScriptContentParser
-from LocalData.tracker import WebTracker
+from processing.tracker import WebTracker
 
 from contextlib import contextmanager
 

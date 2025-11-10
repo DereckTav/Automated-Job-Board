@@ -5,8 +5,8 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from unittest.mock import patch
 import time
 
-from Robots.robots_parser import RobotsTxtParser
-from Robots.robots import RobotsRules
+from src.Robots.robots_parser import RobotsTxtParser
+from src.Robots.robots import RobotsRules
 
 # Mock HTTP Server for testing
 class MockRobotsHandler(BaseHTTPRequestHandler):

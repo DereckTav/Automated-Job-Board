@@ -11,7 +11,7 @@ from Http.http_client import Session
 from JobParser.parsers.download_parser import DownloadParser
 from JobParser.parsers.js_parser import JavaScriptContentParser
 from JobParser.parsers.static_parser import StaticContentParser
-from LocalData.tracker import WebTracker
+from processing.tracker import WebTracker
 from LocalData.test_cache import Cache
 from WebsiteManager import Manager
 from contextlib import contextmanager

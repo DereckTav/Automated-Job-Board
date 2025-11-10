@@ -6,7 +6,7 @@ import time
 
 from JobParser.parsers.static_parser import StaticContentParser
 from Http.http_client import Session
-from LocalData.tracker import WebTracker
+from processing.tracker import WebTracker
 
 from contextlib import contextmanager
 

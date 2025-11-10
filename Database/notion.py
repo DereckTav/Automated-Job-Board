@@ -10,7 +10,7 @@ from Database.util import batch_zip
 
 import aiohttp
 from Http.http_client import Session
-from JobParser.output import Result
+from parsers.output import Result
 
 from dotenv import load_dotenv
 from urllib.parse import urlparse
