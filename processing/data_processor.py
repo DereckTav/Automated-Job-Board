@@ -101,7 +101,7 @@ class PositionNormalizationProcessor(DataProcessor):
 
     async def process(self, df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame:
         from processing.util import normalize_position
-        position_col = config['selectors'].get('position', 'position')
+        position_col = config['selectors'].get('position')
         return normalize_position(df, position_col)
 
 class NameRegularizationProcessor(DataProcessor):

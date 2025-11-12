@@ -3,14 +3,14 @@ import atexit
 import random
 import yaml
 import sys
-from typing import Dict, Optional
+from typing import Dict
 
 from fake_useragent import UserAgent
 
 from Database.notion import NotionDatabase, MessageBus
 import logs.logger as log
 
-from net.shared_browser_manager import SharedBrowserManager
+from net.browser_manager import BrowserManager
 from net.http_client import Session
 from parsers.base_parser import BaseParser
 
@@ -87,9 +87,15 @@ class Manager:
         """
         session = Session()
         tracker = Tracker()
-        browser_manager = SharedBrowserManager()
+        browser_manager = BrowserManager()
         user_agent_provider = UserAgent()
-        parser_factory = ParserFactory(session, user_agent_provider, browser_manager, tracker, True)
+        parser_factory = ParserFactory(
+            session=session,
+            browser_manager=browser_manager,
+            user_agent_provider=user_agent_provider,
+            tracker=tracker,
+            enable_robots_refresh=True
+        )
 
         return {
             'DOWNLOAD': parser_factory.create_download_parser(),

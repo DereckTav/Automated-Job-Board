@@ -7,7 +7,9 @@ def normalize_position(df: pd.DataFrame, position: str) -> pd.DataFrame:
 
     if position in df.columns:
         df = df.copy()
-        df[position] = df[position].str.replace(",", " -", regex=False)
+        df[position] = (df[position].str.replace(",", " -", regex=False)
+                        .str.replace("，", " -", regex=False)
+                        .str.replace("、", " -", regex=False))
 
     return df
 

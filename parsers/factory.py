@@ -12,6 +12,7 @@ from robots.cache import InMemoryRobotsCache
 from robots.parser import RobotsTxtParser
 from robots.refresher import RobotsCacheRefresher
 
+from logs import logger as log
 
 class ParserFactory:
     """
@@ -54,6 +55,7 @@ class ParserFactory:
                 CustomEmailProcessor(include_parsers=['DOWNLOAD_PARSER'])
             ])
         """
+        log.info("Creating download parser")
         fetcher = DownloadFetcher(self.session, self.ua_provider)
 
         if processors is None:
@@ -74,6 +76,7 @@ class ParserFactory:
 
     def create_static_parser(self, processors: List[DataProcessor] = None) -> StaticContentParser:
         """Create static parser with specified processors"""
+        log.info("Creating static parser")
         fetcher = HttpContentFetcher(self.session, self.ua_provider, self.robots_parser)
 
         if processors is None:
@@ -92,6 +95,7 @@ class ParserFactory:
 
     def create_js_parser(self, processors: List[DataProcessor] = None) -> JavaScriptContentParser:
         """Create JS parser with specified processors"""
+        log.info("Creating JS parser")
         fetcher = SeleniumContentFetcher(self.browser_manager, self.ua_provider, self.robots_parser)
 
         if processors is None:
@@ -120,6 +124,7 @@ class ParserFactory:
         from Airtable, then processes them like DownloadParser.
         """
         # Create Airtable-specific fetcher
+        log.info("Creating Selenium download parser")
         if fetcher is None:
             fetcher = AirtableSeleniumFetcher(self.browser_manager)
 

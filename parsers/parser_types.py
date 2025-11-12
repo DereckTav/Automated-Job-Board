@@ -1,6 +1,9 @@
 from io import StringIO
+
+from net.browser_manager import BrowserManager
 from parsers.base_parser import BaseParser, ParserDependencies
 from typing import Dict, List, Any
+from logs import logger as log
 import asyncio
 import pandas as pd
 
@@ -30,6 +33,8 @@ class StaticContentParser(BaseParser):
         super().__init__(dependencies, "STATIC_PARSER")
 
     async def _extract_data(self, content: Any, selectors: Dict[str, str]) -> Dict[str, List[str]]:
+        log.info(f"StaticContentParser: Extracting {selectors}")
+
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(content, 'html.parser')
 
@@ -58,30 +63,34 @@ class JavaScriptContentParser(BaseParser):
         super().__init__(dependencies, "JS_PARSER")
 
     async def _extract_data(self, content: Any, selectors: Dict[str, str]) -> Dict[str, List[str]]:
+        log.info(f"JavaScriptContentParser: Extracting {selectors}")
+
         from selenium.webdriver.common.by import By
         driver = content
 
         # Wait for content to load
         await asyncio.sleep(25)
+        try:
+            extracted_data = {}
+            if selectors:
+                for key, selector in selectors.items():
+                    try:
+                        elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                        if key == "application_link":
+                            extracted_data[key] = [
+                                elem.get_attribute("href") or elem.text.strip()
+                                for elem in elements
+                            ]
+                        else:
+                            extracted_data[key] = [elem.text.strip() for elem in elements if elem.text.strip()]
 
-        extracted_data = {}
-        if selectors:
-            for key, selector in selectors.items():
-                try:
-                    elements = driver.find_elements(By.CSS_SELECTOR, selector)
-                    if key == "application_link":
-                        extracted_data[key] = [
-                            elem.get_attribute("href") or elem.text.strip()
-                            for elem in elements
-                        ]
-                    else:
-                        extracted_data[key] = [elem.text.strip() for elem in elements if elem.text.strip()]
+                        await asyncio.sleep(0)
+                    except Exception:
+                        extracted_data[key] = []
 
-                    await asyncio.sleep(0)
-                except Exception:
-                    extracted_data[key] = []
-
-        return extracted_data
+            return extracted_data
+        finally:
+            await BrowserManager().close_browser(driver)
 
 
 class SeleniumDownloadParser(BaseParser):
@@ -100,6 +109,8 @@ class SeleniumDownloadParser(BaseParser):
             return {}
 
         try:
+            log.info(f"SeleniumDownloadParser: Extracting {selectors}")
+
             # Parse CSV
             df = await asyncio.to_thread(pd.read_csv, StringIO(content))
 
@@ -112,6 +123,5 @@ class SeleniumDownloadParser(BaseParser):
             return extracted_data
 
         except Exception as e:
-            from logs import logger as log
             log.error(f"Failed to parse CSV: {e}")
             return {}

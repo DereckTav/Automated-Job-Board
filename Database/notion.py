@@ -92,7 +92,7 @@ class NotionDatabase:
         if not self._initialized:
             self.headers = {
                "Authorization": f"Bearer {NOTION_API_KEY}",
-               "Content-Type": "processing/json",
+               "Content-Type": "application/json",
                "Notion-Version": "2025-09-03"
             }
 
@@ -125,6 +125,11 @@ class NotionDatabase:
             Any URL -- 2000 characters -- if url is not under 2000 just leave domain
             title.text.content -- 2000 chars -- (Title (company name)) slice so its under 2000
             Max characters per option name -- 100 characters -- (position) (slice) """
+
+        if position:
+            position = (position.replace(",", " -")
+                        .replace("，", " -")
+                        .replace("、", " -"))
 
         body = {
             "parent": {
@@ -159,10 +164,8 @@ class NotionDatabase:
             if children:
                 body["children"] = children
 
-        if position:
-            body["properties"]["Position"] = {"multi_select": [{"name": position[:100]}]}
-
         if company_size:
+            company_size = company_size.replace(",", " -")
             body["properties"]["Company Size"] = {"multi_select": [{"name": company_size[:100]}]}
 
         if url:
@@ -181,6 +184,7 @@ class NotionDatabase:
         ) -> Optional[dict]:
 
         body = self._generate_body(company_name, position, url, job_description, company_size)
+
         try:
             async with self.session.post(self.api_endpoint, json=body, headers=self.headers) as response:
                 response_data = await response.json()
@@ -188,6 +192,8 @@ class NotionDatabase:
                 return response_data
 
         except aiohttp.ClientResponseError as e:
+            print(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n "
+                          f"response:{json.dumps(response_data, indent=4)}")
             log.error(f"Notion API error {response.status} for {company_name}: {url}: stack trace: {e}, \n\n "
                           f"response:{json.dumps(response_data, indent=4)}")
             return None

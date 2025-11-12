@@ -10,7 +10,7 @@ import os
 import requests
 
 from Database.notion import NotionDatabase, Gateway, MessageBus
-from JobParser.output import Result
+from parsers.output import Result
 
 load_dotenv()
 
@@ -23,7 +23,7 @@ QUERY_ENDPOINT = f"https://api.notion.com/v1/data_sources/{DATA_SOURCE_ID}/query
 
 headers = {
         "Authorization": f"Bearer {NOTION_API_KEY}",
-        "Content-Type": "processing/json",
+        "Content-Type": "application/json",
         "Notion-Version": "2025-09-03"
     }
 

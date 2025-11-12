@@ -6,7 +6,7 @@ import time
 from fake_useragent import UserAgent
 
 from net.http_client import Session
-from net.shared_browser_manager import SharedBrowserManager
+from net.browser_manager import BrowserManager
 from parsers.factory import ParserFactory
 from processing.tracker import Tracker
 
@@ -118,7 +118,7 @@ def mock_server(port=PORT):
 def get_factory():
     session = Session()
     tracker = Tracker()
-    browser_manager = SharedBrowserManager()
+    browser_manager = BrowserManager()
     user_agent_provider = UserAgent()
     factory = ParserFactory(session, browser_manager, tracker, user_agent_provider)
     return factory
