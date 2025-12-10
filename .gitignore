@@ -34,4 +34,4 @@ log/
 
 
 # Collection of Websites that are being parsed
-websites.yaml
+configs/websites.yaml

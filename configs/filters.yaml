@@ -1,0 +1,50 @@
+# Data Processing Pipline
+
+# General rules
+General:
+
+  # ignore roles with certain features
+  ignore:
+
+    # ignore roles where position has tag
+    position:
+      - "graduate"
+      - "🎓"
+      - "phd"
+
+    # ignore roles where link has tag
+    link:
+      - "🔒"
+
+  # forward fill chars that are considered null (for company name)
+  normalize:
+
+    # chars to treat as null
+    char:
+      - "↳"
+
+# rules for sites
+Specific:
+
+  # used to identify which site this filter belongs to
+  example.com1:   # this is the site id
+
+    # ignore roles with certain features
+    ignore:
+
+      # ignore roles where position has tag
+      position:
+        - "graduate"
+        - "🎓"
+        - "phd"
+
+      # ignore roles where link has tag
+      link:
+        - "🔒"
+
+    # forward fill chars that are considered null (for company name)
+    normalize:
+
+      # chars to treat as null
+      char:
+        - "↳"
