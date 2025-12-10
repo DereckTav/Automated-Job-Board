@@ -5,7 +5,7 @@ from interfaces.content import ContentFetcher
 from parsers.parser_types import DownloadParser, StaticContentParser, JavaScriptContentParser, SeleniumDownloadParser
 from processing.data_processor import ChangeDetectionProcessor, NameRegularizationProcessor, PositionNormalizationProcessor, \
     DateFilterProcessor, IgnoreDataWithFlagProcessor, ColumnRegularizationProcessor
-from processing.fetchers import HttpContentFetcher, SeleniumContentFetcher, DownloadFetcher, AirtableSeleniumFetcher
+from parsers.fetchers import HttpContentFetcher, SeleniumContentFetcher, DownloadFetcher, AirtableSeleniumFetcher
 from interfaces.data import DataProcessor
 from processing.pipeline import ProcessingPipeline
 from robots.cache import InMemoryRobotsCache

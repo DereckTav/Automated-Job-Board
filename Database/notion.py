@@ -223,16 +223,18 @@ class NotionDatabase:
                       f" response: {json.dumps(response_data, indent=4)}"
             log.error(f"[[{parser_type}]]" + message if parser_type else message)
 
-            await MessageBus().publish(
-                Result(
-                    position=position,
-                    application_link=url,
-                    company_name=company_name,
-                    parser_type=parser_type,
-                    company_size=company_size,
-                    description=job_description
+            if response_data.get("code") == "conflict_error" and response.status == 409:
+                await MessageBus().publish(
+                    Result(
+                        position=position,
+                        application_link=url,
+                        company_name=company_name,
+                        parser_type=parser_type,
+                        company_size=company_size,
+                        description=job_description
+                    )
                 )
-            )
+                log.info(f"Republishing {company_name} due to conflict error")
 
             return
 
@@ -245,11 +247,28 @@ class NotionDatabase:
         if len(data) > 3:
             raise ValueError("Expected at most 3 dictionaries")
 
+        valid_data = []
+        for item in data:
+            company = item.get('company_name')
+            position = item.get('position')
+
+            if not company or not position or len(company) < 2 or len(position) < 2:
+                log.warning(f"Skipping corrupt/invalid data: {company}:{position}")
+                continue
+
+            valid_data.append(item)
+
+        if not valid_data:
+            return 0.0
+
         if not cleaner_active:
             start_time = time.time()
 
-            tasks = [
-                self._post(
+            for i, item in enumerate(valid_data):
+                if i > 0:
+                    await asyncio.sleep(0.35)  # 350ms spacing = ~2.85 requests/sec
+
+                await self._post(
                     company_name=item.get('company_name'),
                     position=item.get('position'),
                     url=item.get('application_link'),
@@ -257,56 +276,56 @@ class NotionDatabase:
                     company_size=item.get('company_size'),
                     parser_type=parser_type
                 )
-                for item in data
-            ]
-
-            await asyncio.gather(*tasks, return_exceptions=True)
 
             # call cycle (per second):
                 # 3 calls (then another) -> 3 calls -> repeat
 
             # Calculate remaining time to reach 1 second
             elapsed = time.time() - start_time
-            remaining = max(0.0, 1.0 - elapsed)
+            remaining = max(0.5, 1.0 - elapsed)
             return remaining
 
         else:
-            tasks = [
-                self._post(
-                    company_name=data[i].get('company_name'),
-                    position=data[i].get('position'),
-                    url=data[i].get('application_link'),
-                    job_description=data[i].get('description'),
-                    company_size=data[i].get('company_size'),
-                    parser_type=parser_type
-                )
-                for i in range(min(2, len(data)))
-            ]
 
-            await asyncio.gather(*tasks, return_exceptions=True)
+            # possible call cycles (per second):
+            # 2 calls (then another) -> 1 call -> repeat
+            # 3 calls (then another) -> 1 call -> repeat
+            # 2 calls (then another) -> 2 calls -> repeat
 
-            await asyncio.sleep(1)
+            start_time = None
 
-            start_time = time.time()
+            for i, item in enumerate(valid_data):
+                if i < 2:
+                    # First two items, optional delay between them
+                    if i > 0:  # only delay after the first one
+                        await asyncio.sleep(0.35)
+                    await self._post(
+                        company_name=item.get('company_name'),
+                        position=item.get('position'),
+                        url=item.get('application_link'),
+                        job_description=item.get('description'),
+                        company_size=item.get('company_size'),
+                        parser_type=parser_type
+                    )
+                elif i == 2:
+                    await asyncio.sleep(1)
 
-            # Send the 3rd one
-            if len(data) > 2:
-                asyncio.create_task(self._post(
-                    company_name=data[2].get('company_name'),
-                    position=data[2].get('position'),
-                    url=data[2].get('application_link'),
-                    job_description=data[2].get('description'),
-                    company_size=data[2].get('company_size'),
-                    parser_type=parser_type
-                ))
+                    start_time = time.time()
 
-            #possible call cycles (per second):
-                # 2 calls (then another) -> 1 call -> repeat
-                # 3 calls (then another) -> 1 call -> repeat
-                # 2 calls (then another) -> 2 calls -> repeat
+                    await self._post(
+                        company_name=item.get('company_name'),
+                        position=item.get('position'),
+                        url=item.get('application_link'),
+                        job_description=item.get('description'),
+                        company_size=item.get('company_size'),
+                        parser_type=parser_type
+                    )
+
+            if start_time is None:
+                return 1
 
             elapsed = time.time() - start_time
-            remaining = max(0.0, 1.0 - elapsed)
+            remaining = max(0.5, 1.0 - elapsed)
             return remaining
 
     async def _query_database_2(self):
@@ -368,8 +387,8 @@ class NotionDatabase:
         tasks = []
 
         for page in pages:
-            date = page["properties"]["Created time"]["created_time"]
-            page_date = datetime.fromisoformat(str(date))
+            date_str = page["properties"]["Created time"]["created_time"]
+            page_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
 
             if page_date < cutoff:
                 await asyncio.sleep(1) # rate limits this to 1 per second

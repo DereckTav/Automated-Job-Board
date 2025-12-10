@@ -3,6 +3,7 @@ from interfaces.tracker import ChangeTracker
 from typing import List, Dict, Any
 from datetime import datetime
 import pandas as pd
+import numpy as np
 
 
 class DateFilterProcessor(DataProcessor):
@@ -26,7 +27,8 @@ class DateFilterProcessor(DataProcessor):
         date_format = config['date_format']
 
         if "-relative" in date_format:
-            df['date'] = df['date'].str.extract(r'(\d+)').astype(int)
+            match = df['date'].str.extract(r'(?i)(\d+)\s*(m|h|d|day)')
+            df['days'] = np.where(match[1].str.lower().isin(['m', 'h']), 0, match[0].astype(int))
             return df[df['date'].isin([0, 1])]  # 0 is today and 1 is yesterday
 
         else:
@@ -101,8 +103,7 @@ class PositionNormalizationProcessor(DataProcessor):
 
     async def process(self, df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame:
         from processing.util import normalize_position
-        position_col = config['selectors'].get('position')
-        return normalize_position(df, position_col)
+        return normalize_position(df)
 
 class NameRegularizationProcessor(DataProcessor):
     """

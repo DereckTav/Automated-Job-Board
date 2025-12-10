@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 
-def normalize_position(df: pd.DataFrame, position: str) -> pd.DataFrame:
+def normalize_position(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
 
-    if position in df.columns:
+    if 'position' in df.columns:
         df = df.copy()
-        df[position] = (df[position].str.replace(",", " -", regex=False)
+        df['position'] = (df['position'].str.replace(",", " -", regex=False)
                         .str.replace("，", " -", regex=False)
                         .str.replace("、", " -", regex=False))
 
