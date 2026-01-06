@@ -1,5 +1,5 @@
 from src.core.parser.components.fetchers.core.builder import Builder
 
 
-class FetcherBuilder(Builder):
+class ProxyFetcherBuilder(Builder):
     pass

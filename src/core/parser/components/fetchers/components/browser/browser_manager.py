@@ -97,7 +97,7 @@ class BrowserManager:
             chrome_options = self._get_options(self._headless, download_dir=download_dir)
 
             driver = webdriver.Chrome(options=chrome_options)
-            driver.set_page_load_timeout(300)
+            driver.set_page_load_timeout(300) # 5 mins
 
             stealth(driver,
                     languages=["en-US", "en"], # type: ignore
@@ -115,10 +115,11 @@ class BrowserManager:
             LOGGER.error(f"(BrowserManager) Failed to create browser: {e}")
             raise
 
-    '''
-    make sure to resolve the persistent driver
-    '''
+    # maybe later add timer, for now the page load should handle some of the responsibility of ending this resource
     async def get_persistent_driver(self) -> webdriver.Chrome:
+        '''
+        make sure to resolve the persistent driver
+        '''
         driver = await self._browser_queue.get()
         return driver
 
@@ -146,10 +147,13 @@ class BrowserManager:
             self._driver_to_idx[driver] = i
             await self._browser_queue.put(driver)
 
+        LOGGER.info(f'(BrowserManager) {self._max_browser_instances} Browsers created')
+
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.close()
+        LOGGER.info(f'(BrowserManager) closed')
 
     async def close(self):
         await self._cleanup_directories()
@@ -166,7 +170,7 @@ class BrowserManager:
                 elif os.path.isdir(file_path):
                     shutil.rmtree(file_path)  # Deletes subdirectory
             except Exception as e:
-                # TODO log it
+                LOGGER.error("(BrowserManager) Failed to clean up directory '%s'" % file_path)
                 pass
 
     async def _clear_directories(self) -> None:
@@ -180,6 +184,8 @@ class BrowserManager:
             task.append(self._loop.run_in_executor(None, lambda: self._clear_dir(directory=directory))) # type: ignore
 
         await asyncio.gather(*task)
+
+        LOGGER.info(f'(BrowserManager) Cleared directories')
 
 
     async def _cleanup_directories(self):
@@ -196,6 +202,8 @@ class BrowserManager:
 
         await asyncio.gather(*tasks)
 
+        LOGGER.info(f'(BrowserManager) cleaned up directories')
+
     async def _cleanup_drivers(self):
         for driver in self._drivers:
             try:
@@ -204,3 +212,5 @@ class BrowserManager:
                 pass
 
         self._drivers.clear()
+
+        LOGGER.info(f'(BrowserManager) cleaned up drivers')

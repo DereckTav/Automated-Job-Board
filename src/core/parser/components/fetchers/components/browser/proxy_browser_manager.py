@@ -1,15 +1,18 @@
 from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
-from typing import Optional, List, Union, TYPE_CHECKING
+from typing import Optional, List, TYPE_CHECKING, Dict
 
-#TODO do I import both seleniumwire and selenium?
-from selenium import webdriver
 from seleniumwire import webdriver
 from selenium_stealth import stealth
 
 from src.core.logs import Logger
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
+from src.core.parser.components.fetchers.components.browser.exceptions.not_configured_exception import \
+    ProxyBrowsersNotConfigured
+from src.core.parser.components.fetchers.services.proxy_service.exceptions.Invalid_number_of_proxies import InvalidNumberOfProxies
+from src.core.parser.components.fetchers.services.proxy_service.formatter.proxy_formatter import \
+    SeleniumWireProxyFormatter
 
 if TYPE_CHECKING:
     from src.core.parser.components.fetchers.services.proxy_service.proxy import Proxy
@@ -17,17 +20,12 @@ if TYPE_CHECKING:
 
 LOGGER = Logger('app')
 
-'''
-        import tempfile
-        download_dir = tempfile.mkdtemp(prefix=f'downloads_{int(time.time() * 1000)}_')
-'''
-
-# TODO finish tutorial to see if properly implemented
 class ProxyBrowserManager(BrowserManager, Proxy):
 
     def __init__(
             self,
             proxy_manager: ProxyManager,
+            proxy_formatter: SeleniumWireProxyFormatter,
             headless: bool = True,
             max_browser_instances: int = 2,
             download_dir: Optional[str] = None,
@@ -36,7 +34,8 @@ class ProxyBrowserManager(BrowserManager, Proxy):
             headless=headless,
             max_browser_instances=max_browser_instances,
             download_dir=download_dir,
-            proxy_manager=proxy_manager
+            proxy_manager=proxy_manager,
+            proxy_formatter=proxy_formatter
         )
 
         self._configured = False
@@ -44,7 +43,7 @@ class ProxyBrowserManager(BrowserManager, Proxy):
     def _create_browser(
             self,
             download_dir: Optional[str],
-            proxy: Optional[str] = None
+            proxy: Dict[str, str] = None
     ) -> webdriver.Chrome:
         """
         Create a browser with proxy and return the driver.
@@ -60,7 +59,7 @@ class ProxyBrowserManager(BrowserManager, Proxy):
                 }
             )
 
-            driver.set_page_load_timeout(300)
+            driver.set_page_load_timeout(300) # 5 mins
 
             stealth(driver,
                     languages=["en-US", "en"], # type: ignore
@@ -82,12 +81,14 @@ class ProxyBrowserManager(BrowserManager, Proxy):
         if len(proxies) != self._max_browser_instances:
             raise
 
+        proxies = self.proxy_formatter.apply_format(proxies)
+
         tasks = []
 
         for i in range(self._max_browser_instances):
             tasks.append(self._loop.run_in_executor(None, lambda: self._create_browser(
                 download_dir=f"{self._download_dir}_{i}" if self._download_dir else None,
-                proxy=proxies[i])))
+                proxy=proxies[i]))) # type: ignore  (the formatter should return the right type)
 
         drivers = await asyncio.gather(*tasks)
 
@@ -98,17 +99,20 @@ class ProxyBrowserManager(BrowserManager, Proxy):
 
         self._configured = True
 
+        LOGGER.info(f"(BrowserManager) Successfully configured proxies: {self._max_browser_instances}")
+
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self._configured:
             await super().__aexit__(exc_type, exc_val, exc_tb)
+            LOGGER.info("(BrowserManager) Closed")
 
     @asynccontextmanager
     async def get_driver(self):
         if not self._configured:
-            raise # error about driver not being a proxy
+            raise ProxyBrowsersNotConfigured("Proxy Manager not configured")
 
         driver = await self._browser_queue.get()
 
@@ -119,41 +123,29 @@ class ProxyBrowserManager(BrowserManager, Proxy):
 
     async def get_persistent_driver(self) -> webdriver.Chrome:
         if not self._configured:
-            raise
+            raise ProxyBrowsersNotConfigured("Proxy Manager not configured")
 
-        return await super().get_persistent_driver()
+        return await super().get_persistent_driver() # type: ignore
 
     async def resolve_persistent_driver(self, driver: webdriver.Chrome):
         if not self._configured:
-            raise # error about driver not being a proxy
+            raise ProxyBrowsersNotConfigured("Proxy Manager not configured")
 
         await self.proxy_manager.request_new_proxy(self, driver=driver)
 
-    async def change_proxy(self, proxies: Union[str, List[str]], driver: webdriver.Chrome = None) -> None:
+    async def change_proxy(self, proxies: str | list[str], driver: webdriver.Chrome = None) -> None:
         if isinstance(proxies, list):
-            raise
+            LOGGER.warning(f"(BrowserManager) Change proxies: {proxies}, required: 1")
+            raise InvalidNumberOfProxies("Invalid number of proxies")
 
         idx = self._driver_to_idx[driver]
 
-        try:
-            driver.quit()
-        except:
-            pass
-
-        tasks = []
-
         directory = f"{self._download_dir}_{idx}" if self._download_dir else None
 
-        tasks.append(self._loop.run_in_executor(None, lambda: self._create_browser(
-            download_dir=directory,
-            proxy=proxies
-        )))
+        driver.proxy = self.proxy_formatter.apply_format(proxies)
 
-        tasks.append(self._loop.run_in_executor(None, lambda: self._clear_dir(directory)))
+        await self._loop.run_in_executor(None, lambda: self._clear_dir(directory))
 
-        new_driver, _ = await asyncio.gather(*tasks)
-
-        self._drivers[idx] = new_driver
         await self._browser_queue.put(driver)
 
     def type_required(self) -> type[str | list]:
