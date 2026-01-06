@@ -1,3 +1,0 @@
-add pipline to parse certain info of websites
-have llm that decides where these go
-and the job types

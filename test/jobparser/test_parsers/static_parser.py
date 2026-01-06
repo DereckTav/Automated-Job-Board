@@ -6,10 +6,10 @@ import time
 
 from fake_useragent import UserAgent
 
-from net.http_client import Session
-from net.browser_manager import BrowserManager
-from parsers.factory import ParserFactory
-from processing.tracker import Tracker
+from old.net.http_client import Session
+from src.core.parser.components.fetchers.components.browser import BrowserManager
+from src.core.parser.parser_factory import Factory
+from old.processing import Tracker
 
 from contextlib import contextmanager
 
@@ -135,7 +135,7 @@ def get_factory():
     tracker = Tracker()
     browser_manager = BrowserManager()
     user_agent_provider = UserAgent()
-    factory = ParserFactory(session, browser_manager, tracker, user_agent_provider)
+    factory = Factory(session, browser_manager, tracker, user_agent_provider)
     return factory
 
 #test parse

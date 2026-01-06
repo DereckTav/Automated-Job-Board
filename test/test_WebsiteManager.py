@@ -11,9 +11,9 @@ from Http.http_client import Session
 from jobparser.parsers.download_parser import DownloadParser
 from jobparser.parsers.js_parser import JavaScriptContentParser
 from jobparser.parsers.static_parser import StaticContentParser
-from processing.tracker import WebTracker
+from old.processing import WebTracker
 from LocalData.test_cache import Cache
-from WebsiteManager import Manager
+from src.core.app import Manager
 from contextlib import contextmanager
 
 '''

@@ -48,4 +48,4 @@ test_*.py
 
 # Logs (generate fresh logs in container)
 *.log
-logs/
+old/logs/

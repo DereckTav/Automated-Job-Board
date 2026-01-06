@@ -2,13 +2,12 @@ import asyncio
 import threading
 import pytest
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from unittest.mock import patch
 import time
 
-from robots.parser import RobotsTxtParser
-from robots.output import RobotsRules
-from robots.cache import InMemoryRobotsCache
-from robots.refresher import RobotsCacheRefresher
+from src.core.parser.components.fetchers.components.robots import RobotsTxtParser
+from src.core.parser.components.fetchers.components.robots.robots_rules import RobotsRules
+from src.core.parser.components.fetchers import InMemoryRobotsCache
+from src.core.parser.components.fetchers import RobotsCacheRefresher
 
 
 # Mock HTTP Server for testing

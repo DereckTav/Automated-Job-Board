@@ -11,7 +11,7 @@ env/
 
 # Logs
 *.log
-logs/
+old/logs/
 log/
 
 # Testing
@@ -32,6 +32,11 @@ log/
 *~
 .DS_Store
 
-
 # Collection of Websites that are being parsed
-configs/websites.yaml
+configs/filters.yaml
+configs/types.yaml
+configs/sites.yaml
+configs/old.yaml
+
+#integrations
+/src/integrations/notion/database.py

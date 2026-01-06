@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 import os
 import requests
 
-from Database.notion import NotionDatabase, Gateway, MessageBus
-from parsers.output import Result
+from old.Database import NotionDatabase, Gateway, MessageBus
+from src.models.results import Result
 
 load_dotenv()
 
@@ -380,9 +380,9 @@ async def test_batch_post_2(reset_singleton):
     db = NotionDatabase()
     await asyncio.sleep(1)
 
-    import Database.notion
+    import src.integrations.notion
 
-    Database.notion.cleaner_active = True
+    src.integrations.notion.cleaner_active = True
 
     data = {
         "company_name": "Company",
@@ -419,7 +419,7 @@ async def test_batch_post_2(reset_singleton):
     await asyncio.sleep(1)
     await db._batch_delete_pages(pages)
 
-    Database.notion.cleaner_active = False
+    src.integrations.notion.cleaner_active = False
 
 @pytest.mark.asyncio
 async def test_delete_old_entries(reset_singleton):

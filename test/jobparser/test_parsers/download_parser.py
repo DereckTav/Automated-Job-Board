@@ -8,14 +8,14 @@ import time
 
 from fake_useragent import UserAgent
 
-from net.http_client import Session
+from old.net.http_client import Session
 
 from contextlib import contextmanager
 
-from net.browser_manager import BrowserManager
-from parsers.factory import ParserFactory
-from parsers.output import Result
-from processing.tracker import Tracker
+from src.core.parser.components.fetchers.components.browser import BrowserManager
+from src.core.parser.parser_factory import Factory
+from src.models.results import Result
+from old.processing import Tracker
 
 '''
 if you run test case make sure to switch dates in test.html
@@ -133,7 +133,7 @@ def get_factory_and_tracker():
     tracker = Tracker()
     browser_manager = BrowserManager()
     user_agent_provider = UserAgent()
-    factory = ParserFactory(session, browser_manager, tracker, user_agent_provider)
+    factory = Factory(session, browser_manager, tracker, user_agent_provider)
     return factory, tracker
 
 #test parse
