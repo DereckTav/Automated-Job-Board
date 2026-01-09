@@ -15,6 +15,8 @@ from src.core.logs import Logger
 
 LOGGER = Logger('app')
 
+#Todo log file clearing
+
 class BrowserManager:
     def __init__(
             self,
@@ -128,17 +130,23 @@ class BrowserManager:
 
     @asynccontextmanager
     async def get_driver(self):
+        """
+        returns a driver with download_dir if available, after use it clears download_dir
+        """
         driver = await self._browser_queue.get()
 
         try:
             yield driver
         finally:
             if self._download_dir is not None:
-                idx = self._driver_to_idx[driver]
-                directory = f"{self._download_dir}_{idx}" if self._download_dir else None
+                directory = self.get_download_directory(driver)
                 await self._loop.run_in_executor(None, self._clear_dir(directory)) # type: ignore
 
             await self._browser_queue.put(driver)
+
+    def get_download_directory(self, driver: webdriver.Chrome) -> Optional[str]:
+        idx = self._driver_to_idx[driver]
+        return f"{self._download_dir}_{idx}" if self._download_dir else None
 
     async def __aenter__(self):
         for i in range(self._max_browser_instances):

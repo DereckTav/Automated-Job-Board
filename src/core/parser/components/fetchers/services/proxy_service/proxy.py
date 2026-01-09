@@ -19,6 +19,10 @@ class Proxy(ABC):
     def type_required(self) -> type[str | list]:
         pass
 
+    @abstractmethod
+    def number_of_proxies_needed(self) -> int:
+        pass
+
     async def _request_new_proxy(self, **kwargs) -> None:
         await self.proxy_manager.request_new_proxy(self, **kwargs)
 

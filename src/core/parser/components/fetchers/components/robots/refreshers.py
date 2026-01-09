@@ -1,6 +1,5 @@
 import asyncio
 from typing import Optional
-from urllib.parse import urlparse
 
 from src.core.parser.components.fetchers.components.robots.cache import RobotsCache
 from src.core.parser.components.fetchers.components.robots.parser import RobotsParser
@@ -73,11 +72,8 @@ class RobotsCacheRefresher:
         Check if a URL is still fetchable according to robots.txt.
         """
         try:
-            parsed = urlparse(url)
-            base_url = f"{parsed.scheme}://{parsed.netloc}"
-
             # Get fresh rules (won't use cache since we're validating)
-            rules = await self.parser._parse_robots_txt(url, base_url, user_agent)
+            rules = await self.parser.parse_robots_txt(url, user_agent)
 
             return rules.can_fetch
 

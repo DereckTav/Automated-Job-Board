@@ -20,6 +20,8 @@ if TYPE_CHECKING:
 
 LOGGER = Logger('app')
 
+#Todo log file clearing
+
 class ProxyBrowserManager(BrowserManager, Proxy):
 
     def __init__(
@@ -29,13 +31,15 @@ class ProxyBrowserManager(BrowserManager, Proxy):
             headless: bool = True,
             max_browser_instances: int = 2,
             download_dir: Optional[str] = None,
+            **kwargs
     ):
         super().__init__(
             headless=headless,
             max_browser_instances=max_browser_instances,
             download_dir=download_dir,
             proxy_manager=proxy_manager,
-            proxy_formatter=proxy_formatter
+            proxy_formatter=proxy_formatter,
+            **kwargs
         )
 
         self._configured = False
@@ -43,7 +47,8 @@ class ProxyBrowserManager(BrowserManager, Proxy):
     def _create_browser(
             self,
             download_dir: Optional[str],
-            proxy: Dict[str, str] = None
+            proxy: Dict[str, str] = None,
+            **kwargs
     ) -> webdriver.Chrome:
         """
         Create a browser with proxy and return the driver.
@@ -138,9 +143,7 @@ class ProxyBrowserManager(BrowserManager, Proxy):
             LOGGER.warning(f"(BrowserManager) Change proxies: {proxies}, required: 1")
             raise InvalidNumberOfProxies("Invalid number of proxies")
 
-        idx = self._driver_to_idx[driver]
-
-        directory = f"{self._download_dir}_{idx}" if self._download_dir else None
+        directory = self.get_download_directory(driver)
 
         driver.proxy = self.proxy_formatter.apply_format(proxies)
 
@@ -150,3 +153,6 @@ class ProxyBrowserManager(BrowserManager, Proxy):
 
     def type_required(self) -> type[str | list]:
         return str
+
+    def number_of_proxies_needed(self):
+        return 1

@@ -1,9 +1,21 @@
-'''
-fully usable fetchers
+from abc import ABC
 
-takes in resource_management
-'''
-from abc import ABC, abstractmethod
+from src.core.parser.components.fetchers.services.resource_management import ResourceManager
+
 
 class Builder(ABC):
-    pass
+
+    def __init__(self, resource_management: ResourceManager, **kwargs):
+        self.resource_management = resource_management
+
+    async def build_http_content_fetcher(self):
+        pass
+
+    async def build_selenium_content_fetcher(self):
+        pass
+
+    async def build_download_content_fetcher(self):
+        pass
+
+    async def build_airtable_selenium_content_fetcher(self):
+        pass

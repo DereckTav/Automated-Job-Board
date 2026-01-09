@@ -44,3 +44,6 @@ class AioProxy(aiohttp.ClientSession, Proxy):
                 raise InvalidNumberOfProxies("Invalid number of proxies")
             else:
                 self.proxy = self.proxy_formatter.apply_format(proxies)
+
+    def number_of_proxies_needed(self):
+        return 1

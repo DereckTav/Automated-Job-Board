@@ -14,7 +14,7 @@ from src.core.parser.components.fetchers.components.robots import RobotsCacheRef
 
 from src.core import logs as log
 
-
+# Todo update this
 class ParserFactory:
     """
     Creates parser with proper dependencies.

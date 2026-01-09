@@ -128,3 +128,4 @@ class SeleniumDownloadParser(BaseParser):
 
 # Todo implement rss parser
 # Todo JobSpy parser
+# Todo one for intern list

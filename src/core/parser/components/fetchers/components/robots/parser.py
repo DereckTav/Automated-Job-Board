@@ -11,12 +11,12 @@ class RobotsParser(ABC):
     """
 
     @abstractmethod
-    async def get_rules(self, url: str, base_url: str, user_agent: str) -> RobotsRules:
+    async def get_rules(self, url: str, user_agent: str) -> RobotsRules:
         """Get robots.txt rules for a URL"""
         pass
 
     @abstractmethod
-    async def _parse_robots_txt(self, url: str, base_url: str, user_agent: str) -> RobotsRules:
+    async def parse_robots_txt(self, url: str, user_agent: str) -> RobotsRules:
         """Parse robots.txt file"""
         pass
 
@@ -28,7 +28,7 @@ class RobotsTxtParser(RobotsParser):
     def __init__(self, cache: RobotsCache):
         self.cache = cache
 
-    async def get_rules(self, url: str, base_url: str, user_agent: str) -> RobotsRules:
+    async def get_rules(self, url: str, user_agent: str) -> RobotsRules:
         """
         Get robots.txt rules for a URL.
 
@@ -43,7 +43,7 @@ class RobotsTxtParser(RobotsParser):
                 return self.cache.get(url)
 
             # Parse robots.txt
-            rules = await self._parse_robots_txt(url, base_url, user_agent)
+            rules = await self.parse_robots_txt(url, user_agent)
 
             # Cache if allowed
             if rules.can_fetch:
@@ -59,7 +59,7 @@ class RobotsTxtParser(RobotsParser):
                 user_agent=user_agent
             )
 
-    async def _parse_robots_txt(self, url: str, base_url: str, user_agent: str) -> RobotsRules:
+    async def parse_robots_txt(self, url: str, user_agent: str) -> RobotsRules:
         """
         Parse robots.txt file.
         """
@@ -68,7 +68,7 @@ class RobotsTxtParser(RobotsParser):
         robot_parser = RobotFileParser()
         robot_parser.set_url(url)
 
-        await loop.run_in_executor(None, robot_parser.read)
+        await loop.run_in_executor(None, robot_parser.read) # type: ignore
 
         can_fetch = await loop.run_in_executor(None, robot_parser.can_fetch, user_agent, url)
 
