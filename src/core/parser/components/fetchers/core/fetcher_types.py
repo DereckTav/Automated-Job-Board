@@ -3,23 +3,28 @@ import aiohttp
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
 from src.core.parser.components.fetchers.core.exceptions.robots_txt_not_provided import RobotsTxtNotProvided
 from src.core.parser.components.fetchers.core.fetcher import  ContentFetcher
-from typing import Optional, Any
+from typing import Optional
 import asyncio
 
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from src.core.parser.components.fetchers.components.robots.parser import RobotsParser
-from src.core.logs import Logger
+from src.core.logs import Logger, APP
 
-LOGGER = Logger('app')
+LOGGER = Logger(APP)
 
 async def respect_robots(
         robots_url: str,
         user_agent: str,
         robots_parser: RobotsParser
 ) -> bool:
+    """
+    Raises:
+        RobotsTxtNotProvided: If 'robots_url' is None
+    """
     if not robots_url:
         raise RobotsTxtNotProvided("robots.txt not provided")
 
@@ -49,15 +54,18 @@ class HttpContentFetcher(ContentFetcher):
         self.user_agent = user_agent
         self.robots_parser = robots_parser
 
-    # provide param robots_url
     async def fetch(
             self,
             url: str,
             **kwargs
     ) -> Optional[str]:
+        robots_url = kwargs.get('robots_url')
+
+        if not robots_url:
+            raise ValueError(f"{self.__class__.__name__}.fetch() missing required keyword argument: 'robots_url'")
 
         try:
-            can_parse = await respect_robots(kwargs.get('robots_url'), self.user_agent, self.robots_parser)
+            can_parse = await respect_robots(robots_url, self.user_agent, self.robots_parser)
 
             if not can_parse:
                 LOGGER.warning(f"Robots.txt disallows fetching: {url}")
@@ -97,14 +105,18 @@ class SeleniumContentFetcher(ContentFetcher):
         self.user_agent = user_agent
 
     # provide param robots_url
-    # leaving as any because webdriver could be from selenium or selenium-wire
     async def fetch(
             self,
             url: str,
             **kwargs
-    ) -> Optional[Any]:
+    ) -> Optional[WebDriver]:
+        robots_url = kwargs.get('robots_url')
+
+        if not robots_url:
+            raise ValueError(f"{self.__class__.__name__}.fetch() missing required keyword argument: 'robots_url'")
+
         try:
-            can_parse = await respect_robots(kwargs.get('robots_url'), self.user_agent, self.robots_parser)
+            can_parse = await respect_robots(robots_url, self.user_agent, self.robots_parser)
 
             if not can_parse:
                 LOGGER.warning(f"Robots.txt disallows fetching: {url}")
@@ -191,7 +203,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
             self,
             url: str,
             **kwargs
-    ) -> Optional[Any]:
+    ) -> Optional[str]:
         """
         Fetch CSV content by clicking Airtable's download button.
         """
@@ -222,7 +234,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
             self,
             url: str,
             driver
-    ) -> Optional[Any]:
+    ) -> Optional[str]:
         """
         Click through Airtable UI to download CSV and read content.
 
@@ -249,7 +261,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
             return csv_content
 
         except Exception as e:
-            LOGGER.error(f"{url[:25]}... --- (Airtable Selenium) Download failed: {e}")
+            LOGGER.error(f"{url}... --- (Airtable Selenium) Download failed: {e}")
             import traceback
             LOGGER.error(traceback.format_exc())
             return None
@@ -270,7 +282,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
                 )
             )
 
-            LOGGER.info(f"{url[:25]}... --- (Airtable Selenium) Found menu button! Clicking...")
+            LOGGER.info(f"{url}... --- (Airtable Selenium) Found menu button! Clicking...")
             menu_button.click()
 
             await asyncio.sleep(2)
@@ -278,7 +290,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
             return True
 
         except Exception as e:
-            LOGGER.error(f"{url[:25]}... --- (Airtable Selenium) Failed to click menu button: {e}")
+            LOGGER.error(f"{url}... --- (Airtable Selenium) Failed to click menu button: {e}")
             return False
 
     @staticmethod
@@ -315,7 +327,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
                      "//*[contains(text(), 'Download') or contains(text(), 'Télécharger')]")
                 )
             )
-            LOGGER.info(f"{url[:25]}... --- (Airtable Selenium) Found 'Download' button! Clicking...")
+            LOGGER.info(f"{url}... --- (Airtable Selenium) Found 'Download' button! Clicking...")
             download_csv_btn.click()
 
             # Brief wait after click
@@ -324,7 +336,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
             return True
 
         except Exception as e:
-            LOGGER.error(f"{url[:25]}... --- (Airtable Selenium) Failed to click 'Download CSV' button: {e}")
+            LOGGER.error(f"{url}... --- (Airtable Selenium) Failed to click 'Download CSV' button: {e}")
             return False
 
     async def _wait_and_read_file(
@@ -335,7 +347,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
         """
         Wait for CSV file to be downloaded and read its content.
         """
-        LOGGER.info(f"{url[:25]}... --- (Airtable Selenium) downloading")
+        LOGGER.info(f"{url}... --- (Airtable Selenium) downloading")
         import os
 
         await asyncio.sleep(30)
@@ -358,12 +370,12 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
             seconds_elapsed += 1
 
         if seconds_elapsed > self.timeout:
-            LOGGER.error(f"{url[:25]}... --- (Airtable Selenium) download timed out")
+            LOGGER.error(f"{url}... --- (Airtable Selenium) download timed out")
             return None
 
         if csv_files:
             csv_file = csv_files[0]
-            LOGGER.info(f"{url[:25]}... --- (Airtable Selenium) SUCCESS! Downloaded: {csv_file}")
+            LOGGER.info(f"{url}... --- (Airtable Selenium) SUCCESS! Downloaded: {csv_file}")
 
             # Read file content
             csv_path = os.path.join(download_dir, csv_file)
@@ -375,10 +387,10 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
                 return content
 
             except Exception as e:
-                LOGGER.error(f"{url[:25]}... --- (Airtable Selenium) Failed to read file: {e}")
+                LOGGER.error(f"{url}... --- (Airtable Selenium) Failed to read file: {e}")
                 return None
 
-        LOGGER.error(f"{url[:25]}... --- (Airtable Selenium) Error with files in download directory: {download_dir}")
+        LOGGER.error(f"{url}... --- (Airtable Selenium) Error with files in download directory: {download_dir}")
         return None
 
 

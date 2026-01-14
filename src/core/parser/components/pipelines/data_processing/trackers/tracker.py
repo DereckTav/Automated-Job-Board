@@ -1,8 +1,23 @@
-from src.core.parser.components.pipelines.Interfacetracker import ChangeTracker
+from abc import ABC, abstractmethod
+from typing import Optional
 
 '''
 trackes most recent seen job
 '''
+
+class ChangeTracker(ABC):
+    """
+    Abstraction for tracking content changes.
+    """
+
+    @abstractmethod
+    def get(self, key: str) -> Optional[str]:
+        pass
+
+    @abstractmethod
+    def track(self, key: str, value: str) -> None:
+        pass
+
 class Tracker(ChangeTracker):
     def __init__(self):
         self._tracker = {}

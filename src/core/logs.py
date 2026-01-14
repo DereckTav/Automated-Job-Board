@@ -1,5 +1,7 @@
 import logging
 
+APP = 'App'
+
 class Logger:
     def __init__(self, logger_name):
         log_file = f'{logger_name}.log'

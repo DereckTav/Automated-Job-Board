@@ -11,11 +11,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium_stealth import stealth
 
-from src.core.logs import Logger
+from src.core.logs import Logger, APP
 
-LOGGER = Logger('app')
-
-#Todo log file clearing
+LOGGER = Logger(APP)
 
 class BrowserManager:
     def __init__(
@@ -119,9 +117,9 @@ class BrowserManager:
 
     # maybe later add timer, for now the page load should handle some of the responsibility of ending this resource
     async def get_persistent_driver(self) -> webdriver.Chrome:
-        '''
+        """
         make sure to resolve the persistent driver
-        '''
+        """
         driver = await self._browser_queue.get()
         return driver
 
@@ -178,7 +176,7 @@ class BrowserManager:
                 elif os.path.isdir(file_path):
                     shutil.rmtree(file_path)  # Deletes subdirectory
             except Exception as e:
-                LOGGER.error("(BrowserManager) Failed to clean up directory '%s'" % file_path)
+                LOGGER.error(f"(BrowserManager) Failed to clean up directory '{file_path}'. Error: {e}")
                 pass
 
     async def _clear_directories(self) -> None:

@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 
-from src.models.results import Result
-from src.core.parser.components.pipelines.Interfacetracker import ChangeTracker
+import pandas as pd
+
+from src.core.parser.components.pipelines.data_processing.trackers.tracker import ChangeTracker
 from src.core.parser.components.fetchers.core.fetcher import ContentFetcher
 from src.core.parser.components.pipelines.pipeline import ProcessingPipeline
 
 from typing import Dict, Optional, List, Any
 from abc import ABC, abstractmethod
 
+from src.core.parser.core.exceptions.no_selectors_provided_exception import NoSelectorsProvidedException
 
 @dataclass
 class ParserDependencies:
@@ -18,46 +20,55 @@ class ParserDependencies:
     pipeline: ProcessingPipeline
     tracker: ChangeTracker
 
-#TODO instead of parser_type use : class_name = self.__class__.__name__
 class BaseParser(ABC):
 
-    def __init__(self, dependencies: ParserDependencies, parser_type: str):
+    def __init__(self, dependencies: ParserDependencies):
         self.fetcher = dependencies.fetcher
         self.pipeline = dependencies.pipeline
         self.tracker = dependencies.tracker
-        self.parser_type = parser_type
 
     @abstractmethod
-    async def _extract_data(self, content: Any, selectors: Dict[str, str]) -> List[str]:
-        """Parse raw content into structured data. Subclasses implement this."""
+    async def _extract_data(
+            self,
+            content: Any,
+            selectors: Dict[str, str],
+            url: str
+    ) -> Dict[str, List[str]]:
+        """Parse raw content into structured data. Subclasses implement this.
+            url: for logging
+        """
         pass
 
-    async def parse(self, config: dict) -> Optional['Result']:
+    async def parse(
+            self,
+            config: Dict[str, Any],
+            filters: Dict[str, Any]
+    ) -> Optional[pd.DataFrame]:
         """
         Main parsing flow - same for all parser!
         """
         selectors = config['selectors']
+        url = config['url']
 
         if not selectors:
-            pass
-            # assert exception
+            raise NoSelectorsProvidedException("No selectors provided")
 
         # Step 1: Fetch content (strategy depends on injected fetcher)
-        content = await self.fetcher.fetch(**config)
+        content = await self.fetcher.fetch(url, **config)
         if not content:
             return None
 
         # Step 2: Extract data (strategy depends on subclass)
-        extracted_data = await self._extract_data(content, selectors)
-        if not extracted_data or not any(extracted_data.values()):
+        extracted_data = await self._extract_data(content, selectors, url[:25])
+        if not extracted_data or not any(extracted_data.values()): # type: ignore
             return None
 
+        df = pd.DataFrame(extracted_data)
+
         # Step 4: Run processing pipeline
-        df = await self.pipeline.execute(df, config, self.parser_type)
+        df = await self.pipeline.execute(df, config, filters, self.__class__.__name__)
 
         if df.empty:
             return None
 
-        # Step 5: Return result
-        from src.models.results import Result
-        return Result(self.parser_type, **(df.to_dict(orient='list')))
+        return df

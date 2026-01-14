@@ -17,7 +17,7 @@ General:
       - "🔒"
 
   # forward fill chars that are considered null (for company name)
-  normalize:
+  scrubAndFfill:
 
     # chars to treat as null
     char:
@@ -25,6 +25,11 @@ General:
 
 # rules for sites
 Specific:
+  # note: the reason for this is for adding specific filters based off url
+  # please do not add the same filters that are in general into specific
+  #  just adds un-need complexity: just in case there is a check
+  #
+  #  Below is purely an example
 
   # used to identify which site this filter belongs to
   example.com1:   # this is the site id
@@ -43,7 +48,7 @@ Specific:
         - "🔒"
 
     # forward fill chars that are considered null (for company name)
-    normalize:
+    scrubAndFfill:
 
       # chars to treat as null
       char:

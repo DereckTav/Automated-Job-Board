@@ -1,16 +1,11 @@
-import asyncio
 import tempfile
 import time
-from contextlib import AsyncExitStack
 from typing import Optional
 
 import aiohttp
 
-from src.core.logs import Logger
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
 from src.core.parser.components.fetchers.services.resource_management import ResourceManager
-
-LOGGER = Logger('app')
 
 class BaseResourceManager(ResourceManager):
 

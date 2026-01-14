@@ -3,10 +3,10 @@ from typing import List
 from src.core.parser.core.base_parser import ParserDependencies
 from src.core.parser.components.fetchers.core.fetcher import ContentFetcher
 from src.core.parser.core.parser_types import DownloadParser, StaticContentParser, JavaScriptContentParser, SeleniumDownloadParser
-from src.core.parser.components.pipelines.data_processor import ChangeDetectionProcessor, NameRegularizationProcessor, PositionNormalizationProcessor, \
+from src.core.parser.components.pipelines.data_processing.data_processors import ChangeDetectionProcessor, NameRegularizationProcessor, PositionNormalizationProcessor, \
     DateFilterProcessor, IgnoreDataWithFlagProcessor, ColumnRegularizationProcessor
 from src.core.parser.components.fetchers.core.fetcher_types import HttpContentFetcher, SeleniumContentFetcher, DownloadFetcher, AirtableSeleniumFetcher
-from src.core.parser.components.pipelines.data import DataProcessor
+from src.core.parser.components.pipelines.data_processing.data_processor import DataProcessor
 from src.core.parser.components.pipelines.pipeline import ProcessingPipeline
 from src.core.parser.components.fetchers.components.robots.cache import InMemoryRobotsCache
 from src.core.parser.components.fetchers.components.robots import RobotsTxtParser

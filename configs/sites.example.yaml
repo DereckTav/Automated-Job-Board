@@ -4,7 +4,7 @@ sites:
 
   # specification of websites
   - url: 'www.example.com/parser'
-    robots: 'www.example.com/robots.txt'
+    robots_url: 'www.example.com/robots.txt'
     parser_type: ''
     date_formate: '--relative [formate]'
 

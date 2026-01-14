@@ -1,9 +1,11 @@
 import asyncio
 from typing import Optional
 
+from src.core.logs import Logger, APP
 from src.core.parser.components.fetchers.components.robots.cache import RobotsCache
 from src.core.parser.components.fetchers.components.robots.parser import RobotsParser
 
+LOGGER = Logger(APP)
 
 class RobotsCacheRefresher:
     """
@@ -21,10 +23,12 @@ class RobotsCacheRefresher:
 
     def start(self):
         """Start the background refresh task"""
+        LOGGER.info("(REFRESHER) Starting refresh task")
         if self._task is None or self._task.done():
             self._task = asyncio.create_task(self._refresh_loop())
 
     def stop(self):
+        LOGGER.info("(REFRESHER) Stopping refresh task")
         """Stop the background refresh task"""
         if self._task and not self._task.done():
             self._task.cancel()
@@ -35,18 +39,20 @@ class RobotsCacheRefresher:
         """
         try:
             while True:
+                LOGGER.info("(REFRESHER) is sleeping")
                 await asyncio.sleep(self.refresh_interval)
                 await self._refresh_cache()
 
         except asyncio.CancelledError:
-            import src.core.logs as log
-            log.info("robots cache refresher stopped")
+            LOGGER.info("(REFRESHER) stopped")
             raise
 
     async def _refresh_cache(self):
         """
         Check all cached URLs and remove invalid ones.
         """
+
+        LOGGER.info("(REFRESHER) refreshing cache")
         urls_to_check = self.cache.get_all_urls()
         urls_to_remove = []
 
