@@ -21,7 +21,7 @@
 <div align="center">
 
 <a href="https://github.com/DereckTav/Automated-Job-Board">
-    <img width="4797" height="5000" alt="image" src="https://github.com/user-attachments/assets/b9e395d6-d937-489e-a798-56e290e3d125" />
+    <img width="80" height="80" alt="image" src="https://github.com/user-attachments/assets/b9e395d6-d937-489e-a798-56e290e3d125" />
   </a>
 
 <h3 align="center">
@@ -37,12 +37,12 @@
     <a href="https://github.com/DereckTav/Automated-Job-Board/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
----
 
 # About Project
+---
 
 ## Description
----
+
 keeps track of new job openings without the need for manual searching by centralizing the employment hunt, automatically gathering new opportunities from multiple job boards. Helps maintain an efficient job search workflow, all through Notion.
 
     Key Features
