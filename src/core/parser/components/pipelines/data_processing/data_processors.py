@@ -6,7 +6,7 @@ DateFilterProcessor
 FiltersProcessor
 PositionNormalizationProcessor
 
-for llm version aka (url only)
+for agents version aka (url only)
 changeDetectionProcessor
 """
 import re
