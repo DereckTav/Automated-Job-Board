@@ -16,21 +16,25 @@
 [license-shield]: https://img.shields.io/github/license/DereckTav/Automated-Job-Board.svg?style=for-the-badge
 [license-url]: https://github.com/DereckTav/Automated-Job-Board/blob/master/LICENSE.txt
 
-<!-- PROJECT LOGO -->
 <br />
 <div align="center">
-
-<a href="https://github.com/DereckTav/Automated-Job-Board">
-    <img width="80" height="80" alt="image" src="https://github.com/user-attachments/assets/b9e395d6-d937-489e-a798-56e290e3d125" />
+  <a href="https://github.com/DereckTav/Automated-Job-Board">
+    <img src="https://github.com/user-attachments/assets/b9e395d6-d937-489e-a798-56e290e3d125" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">
-  💼 <a href="https://www.notion.so/Board-2c5048332b688003b602df306157a27b?source=copy_link">[NOT ACTIVE] AutoJobBoard</a>
-</h3>
+  <h3 align="center">AutoJobBoard</h3>
 
-<p align="center">
-    An automated job board that aggregates and displays the latest job postings from multiple sources
-	<br />
+  <p align="center">
+    <a href="#">
+      <img src="https://img.shields.io/badge/Status-Not%20Active-red?style=flat-square" alt="Status" />
+    </a>
+    <br />
+    <br />
+    An automated job board that aggregates and displays the latest job postings.
+    <br />
+    <br />
+    <a href="https://www.notion.so/Board-2c5048332b688003b602df306157a27b?source=copy_link"><strong>💼 View Notion Board »</strong></a>
+    <br />
     <br />
     <a href="https://github.com/DereckTav/Automated-Job-Board/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
