@@ -39,7 +39,6 @@
 </div>
 
 # About Project
----
 
 ## Description
 
