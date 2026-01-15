@@ -52,7 +52,7 @@ keeps track of new job openings without the need for manual searching by central
     
     - Event-Driven & Scheduled Updates (3-24h)
     - 48-Hour Priority Window (5-day rolling history)
-    - proxy rotation
+    - Proxy rotation
 
 
 ## architecture
