@@ -16,29 +16,43 @@
 [license-shield]: https://img.shields.io/github/license/DereckTav/Automated-Job-Board.svg?style=for-the-badge
 [license-url]: https://github.com/DereckTav/Automated-Job-Board/blob/master/LICENSE.txt
 
-# ~~<img width="1" height="1" alt="image" src="https://github.com/user-attachments/assets/8d31e28c-b721-4172-b9cc-459231adf25c" />
-[Job Board](https://www.notion.so/Board-2c5048332b688003b602df306157a27b?source=copy_link)~~
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
 
-1.  architecture
-<img src="imgs/architecture.png">
+<a href="https://github.com/DereckTav/Automated-Job-Board">
+    <img width="4797" height="5000" alt="image" src="https://github.com/user-attachments/assets/b9e395d6-d937-489e-a798-56e290e3d125" />
+  </a>
 
+<h3 align="center">
+  💼 <a href="https://www.notion.so/Board-2c5048332b688003b602df306157a27b?source=copy_link">[NOT ACTIVE] AutoJobBoard</a>
+</h3>
 
+<p align="center">
+    An automated job board that aggregates and displays the latest job postings from multiple sources
+	<br />
+    <br />
+    <a href="https://github.com/DereckTav/Automated-Job-Board/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    ·
+    <a href="https://github.com/DereckTav/Automated-Job-Board/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
 ---
 
-# Automated Job Board
-
-An automated job board that aggregates and displays the latest job postings from multiple sources, updated every 2 days.
+# About Project
 
 ## Description
-
 ---
-keeps track of new job openings without the need for human searching by centralizing the employment hunt by automatically gathering new opportunities from many job boards. Helps Track applications and maintain an efficient job search workflow, all through notion.
+keeps track of new job openings without the need for manual searching by centralizing the employment hunt, automatically gathering new opportunities from multiple job boards. Helps maintain an efficient job search workflow, all through Notion.
 
     Key Features
+    
+    - Event-Driven & Scheduled Updates (3-24h)
+    - 48-Hour Priority Window (5-day rolling history)
 
-    - Automatic updates every 3 to 24 hours
-    - Application tracking and management
-    - Only shows jobs posted within the last 2 days
+
+## architecture
+<img src="imgs/architecture.png">
 
 ## Table of Contents
 
