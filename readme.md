@@ -1,3 +1,22 @@
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+
+
+[contributors-shield]: https://img.shields.io/github/contributors/DereckTav/Automated-Job-Board.svg?style=for-the-badge
+[contributors-url]: https://github.com/DereckTav/Automated-Job-Board/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/DereckTav/Automated-Job-Board.svg?style=for-the-badge
+[forks-url]: https://github.com/DereckTav/Automated-Job-Board/network/members
+[stars-shield]: https://img.shields.io/github/stars/DereckTav/Automated-Job-Board.svg?style=for-the-badge
+[stars-url]: https://github.com/DereckTav/Automated-Job-Board/stargazers
+[issues-shield]: https://img.shields.io/github/issues/DereckTav/Automated-Job-Board.svg?style=for-the-badge
+[issues-url]: https://github.com/DereckTav/Automated-Job-Board/issues
+[license-shield]: https://img.shields.io/github/license/DereckTav/Automated-Job-Board.svg?style=for-the-badge
+[license-url]: https://github.com/DereckTav/Automated-Job-Board/blob/master/LICENSE.txt
+
+
 # 📄[Current Running Job Board](https://www.notion.so/2a8048332b6880ce8cbef9b77bc7d8b1?v=2a8048332b6881f6b8b1000c1b188b85&source=copy_link)
 
 ---
