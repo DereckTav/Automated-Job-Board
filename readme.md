@@ -16,7 +16,11 @@
 [license-shield]: https://img.shields.io/github/license/DereckTav/Automated-Job-Board.svg?style=for-the-badge
 [license-url]: https://github.com/DereckTav/Automated-Job-Board/blob/master/LICENSE.txt
 
-# 📄~[Current Running Job Board](https://www.notion.so/2a8048332b6880ce8cbef9b77bc7d8b1?v=2a8048332b6881f6b8b1000c1b188b85&source=copy_link)~
+# ~~📄[Current Running Job Board](https://www.notion.so/2a8048332b6880ce8cbef9b77bc7d8b1?v=2a8048332b6881f6b8b1000c1b188b85&source=copy_link)~~
+
+1.  architecture
+<img src="imgs/architecture.png">
+
 
 ---
 
