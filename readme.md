@@ -55,7 +55,6 @@ keeps track of new job openings without the need for manual searching by central
 
 ## Table of Contents
 
----
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [websitesl.yaml setup](#instructions-for-setting-up-websitesyaml)
@@ -65,7 +64,6 @@ keeps track of new job openings without the need for manual searching by central
 
 ## Installation
 
----
 Step-by-step instructions on how to get the project running locally:
 
 ```bash
@@ -91,13 +89,11 @@ pip install -r requirements.txt
 
 ## Configuration
 
----
 Before running the script, ensure `websites.yaml` is created and properly configured with:
 - Job board URLs
 - Parsing instructions (selectors) for each site
 - Any required selectors (`company_name`,`position`)
 
----
 ### Instructions for setting up websites.yaml
 
 create file called `websites.yaml` at root
@@ -106,10 +102,8 @@ create file called `websites.yaml` at root
 
 `websites.yaml` contains the necessary configuration for job boards and their parsing instructions.
 
----
 ## Usage
 
----
 ### Basic Usage
 
 
@@ -121,7 +115,6 @@ python main.py
 
 Press `Ctrl+C` to stop
 
----
 ### Running 24/7 (Background Execution)
 
 #### Docker
@@ -145,14 +138,3 @@ docker-compose restart
 # View status
 docker-compose ps
 ```
-
-## **EXTRA INFO**
-
----
-All parsers except `download_parser` use `-relative` to signify that
-the date that is being used is relative
-
-meaning download_parser doesn't work with relative dates
-
-Some sites may load content with react or JS, and for those sites I would recommend using `JS` in `websites.yaml`,
-becuase sometimes it has Unicode `\u003`, which breaks `STATIC` parser.
