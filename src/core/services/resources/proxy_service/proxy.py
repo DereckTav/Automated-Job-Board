@@ -5,10 +5,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from src.core.parser.components.fetchers.services.proxy_service.formatter.proxy_formatter import ProxyFormatter
+from src.core.services.resources.proxy_service.formatter.proxy_formatter import ProxyFormatter
 
 if TYPE_CHECKING:
-    from src.core.parser.components.fetchers.services.proxy_service.proxy_manager import ProxyManager
+    from src.core.services.resources.proxy_service.proxy_manager import ProxyManager
 
 class Proxy(ABC):
     def __init__(self, proxy_manager: ProxyManager, proxy_formatter: ProxyFormatter):

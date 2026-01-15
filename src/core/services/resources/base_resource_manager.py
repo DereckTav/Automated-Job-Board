@@ -5,7 +5,7 @@ from typing import Optional
 import aiohttp
 
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
-from src.core.parser.components.fetchers.services.resource_management import ResourceManager
+from src.core.services.resources.core.resource_management import ResourceManager
 
 class BaseResourceManager(ResourceManager):
 

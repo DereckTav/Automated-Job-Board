@@ -11,25 +11,29 @@ class ChangeTracker(ABC):
     """
 
     @abstractmethod
+    def has(self, key: str) -> bool:
+        pass
+
+    @abstractmethod
     def get(self, key: str) -> Optional[str]:
         pass
 
     @abstractmethod
-    def track(self, key: str, value: str) -> None:
+    def track(self, key: str, hash_value: str) -> None:
         pass
 
 class Tracker(ChangeTracker):
     def __init__(self):
         self._tracker = {}
 
-    def has(self, url):
-        return url in self._tracker
+    def has(self, key: str) -> bool:
+        return key in self._tracker
 
-    def get(self, url):
-        if self.has(url):
-            return self._tracker[url]
+    def get(self, key: str) -> Optional[str]:
+        if self.has(key):
+            return self._tracker[key]
 
         return None
 
-    def track(self, url: str, hash_val: str):
-        self._tracker[url] = hash_val
+    def track(self, key: str, hash_value: str) -> None:
+        self._tracker[key] = hash_value

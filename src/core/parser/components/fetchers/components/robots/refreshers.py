@@ -1,25 +1,35 @@
 import asyncio
 from typing import Optional
 
-from src.core.logs import Logger, APP
+from src.core.logs import APP, Logger
 from src.core.parser.components.fetchers.components.robots.cache import RobotsCache
 from src.core.parser.components.fetchers.components.robots.parser import RobotsParser
 
 LOGGER = Logger(APP)
+
 
 class RobotsCacheRefresher:
     """
     Periodically refreshes cached robots.txt rules.
     """
 
-    def __init__(self,
-                 parser: RobotsParser,
-                 cache: RobotsCache,
-                 refresh_interval_hours: int = 24):
+    def __init__(
+        self,
+        parser: RobotsParser,
+        cache: RobotsCache,
+        refresh_interval_hours: int = 24
+    ):
         self.parser = parser
         self.cache = cache
-        self.refresh_interval = refresh_interval_hours * 60 * 60  # Convert to seconds
+        self.refresh_interval = refresh_interval_hours * 60 * 60
         self._task: Optional[asyncio.Task] = None
+
+    async def __aenter__(self):
+        self.start()
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, exc_traceback):
+        self.stop()
 
     def start(self):
         """Start the background refresh task"""
@@ -40,8 +50,8 @@ class RobotsCacheRefresher:
         try:
             while True:
                 LOGGER.info("(REFRESHER) is sleeping")
-                await asyncio.sleep(self.refresh_interval)
                 await self._refresh_cache()
+                await asyncio.sleep(self.refresh_interval)
 
         except asyncio.CancelledError:
             LOGGER.info("(REFRESHER) stopped")

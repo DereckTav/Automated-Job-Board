@@ -13,7 +13,7 @@ from old.net.http_client import Session
 from contextlib import contextmanager
 
 from src.core.parser.components.fetchers.components.browser import BrowserManager
-from src.core.parser.parser_factory import Factory
+from src.core.parser.parser_builder import Factory
 from src.models.results import Result
 from old.processing import Tracker
 

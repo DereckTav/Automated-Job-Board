@@ -1,3 +1,18 @@
+"""
+    Include acts as a whitelist.
+    Exclude acts as a blacklist.
+
+    Whitelist has priority over blacklist:
+    - If there is a whitelist, the blacklist is essentially nonexistent.
+    - If a parser is in both, the whitelist is prioritized.
+
+    Fallback Logic:
+    - If whitelist is empty or is None, anything will be accepted as long as it's not in the blacklist.
+
+    Meaning that:
+    - By allowing what you want in the whitelist, everything else is blocked.
+    - By blocking what you want in the blacklist, everything else passes as long as long as there is NO WHITELIST.
+"""
 from abc import abstractmethod, ABC
 from typing import Dict, Any, List
 import pandas as pd
@@ -28,6 +43,6 @@ class DataProcessor(ABC):
             self,
             parser_type: str
     ) -> bool:
-        if self.include is not None:
+        if self.include is not None and self.include:
             return parser_type in self.include
         return parser_type not in self.exclude

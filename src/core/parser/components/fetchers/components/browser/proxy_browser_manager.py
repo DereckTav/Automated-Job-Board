@@ -8,15 +8,13 @@ from selenium_stealth import stealth
 
 from src.core.logs import Logger, APP
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
-from src.core.parser.components.fetchers.components.browser.exceptions.not_configured_exception import \
-    ProxyBrowsersNotConfigured
-from src.core.parser.components.fetchers.services.proxy_service.exceptions.Invalid_number_of_proxies import InvalidNumberOfProxies
-from src.core.parser.components.fetchers.services.proxy_service.formatter.proxy_formatter import \
-    SeleniumWireProxyFormatter
+from src.core.parser.components.fetchers.components.browser.exceptions.not_configured_exception import ProxyBrowsersNotConfigured
+from src.core.services.resources.proxy_service.exceptions.Invalid_number_of_proxies import InvalidNumberOfProxies
+from src.core.services.resources.proxy_service.formatter.proxy_formatter import SeleniumWireProxyFormatter
 
 if TYPE_CHECKING:
-    from src.core.parser.components.fetchers.services.proxy_service.proxy import Proxy
-    from src.core.parser.components.fetchers.services.proxy_service.proxy_manager import ProxyManager
+    from src.core.services.resources.proxy_service.proxy import Proxy
+    from src.core.services.resources.proxy_service.proxy_manager import ProxyManager
 
 LOGGER = Logger(APP)
 

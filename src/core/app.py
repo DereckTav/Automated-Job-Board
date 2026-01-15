@@ -14,7 +14,7 @@ from src.core.parser.components.fetchers.components.browser import BrowserManage
 from old.net.http_client import Session
 from src.core.parser.core.base_parser import BaseParser
 
-from src.core.parser.parser_factory import Factory
+from src.core.parser.parser_builder import Factory
 from old.processing import Tracker
 
 '''

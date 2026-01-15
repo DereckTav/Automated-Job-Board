@@ -18,14 +18,12 @@ class ParserDependencies:
     """
     fetcher: ContentFetcher
     pipeline: ProcessingPipeline
-    tracker: ChangeTracker
 
 class BaseParser(ABC):
 
     def __init__(self, dependencies: ParserDependencies):
         self.fetcher = dependencies.fetcher
         self.pipeline = dependencies.pipeline
-        self.tracker = dependencies.tracker
 
     @abstractmethod
     async def _extract_data(

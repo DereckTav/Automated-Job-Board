@@ -6,12 +6,12 @@ import aiohttp
 from aiohttp.typedefs import StrOrURL
 from aiohttp.client import _RequestContextManager
 
-from src.core.parser.components.fetchers.services.proxy_service.exceptions.Invalid_number_of_proxies import InvalidNumberOfProxies
-from src.core.parser.components.fetchers.services.proxy_service.formatter.proxy_formatter import BasicProxyFormatter
+from src.core.services.resources.proxy_service.exceptions.Invalid_number_of_proxies import InvalidNumberOfProxies
+from src.core.services.resources.proxy_service.formatter.proxy_formatter import BasicProxyFormatter
 
 if TYPE_CHECKING:
-    from src.core.parser.components.fetchers.services.proxy_service.proxy import Proxy
-    from src.core.parser.components.fetchers.services.proxy_service.proxy_manager import ProxyManager
+    from src.core.services.resources.proxy_service.proxy import Proxy
+    from src.core.services.resources.proxy_service.proxy_manager import ProxyManager
 
 class AioProxy(aiohttp.ClientSession, Proxy):
 

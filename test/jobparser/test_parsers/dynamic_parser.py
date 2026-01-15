@@ -7,7 +7,7 @@ from fake_useragent import UserAgent
 
 from old.net.http_client import Session
 from src.core.parser.components.fetchers.components.browser import BrowserManager
-from src.core.parser.parser_factory import Factory
+from src.core.parser.parser_builder import Factory
 from old.processing import Tracker
 
 from contextlib import contextmanager
