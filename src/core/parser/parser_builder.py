@@ -99,7 +99,7 @@ class ParserBuilder:
 
         self.fetcher_builder = FetcherBuilder(
             resource_management=self.resource_manager,
-            robots_cache=self.robots_cache
+            robots_parser=self.robots_parser
         )
 
         # Optionally start background refresh

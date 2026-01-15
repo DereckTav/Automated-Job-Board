@@ -1,20 +1,20 @@
-from src.core.parser.components.fetchers.components.robots.cache import RobotsCache
-from src.core.parser.components.fetchers.components.robots.parser import RobotsTxtParser
+from src.core.parser.components.fetchers.components.robots.parser import RobotsParser
 from src.core.parser.components.fetchers.core.builder import Builder
-from src.core.parser.components.fetchers.core.fetcher_types import HttpContentFetcher, SeleniumContentFetcher, \
-    DownloadContentFetcher, AirtableSeleniumContentFetcher
+from src.core.parser.components.fetchers.core.fetcher_types import (
+    HttpContentFetcher, SeleniumContentFetcher, DownloadContentFetcher, AirtableSeleniumContentFetcher
+)
 from src.core.services.resources.core.resource_management import ResourceManager
 
 
 class FetcherBuilder(Builder):
-    def __init__(self, resource_management: ResourceManager, robots_cache: RobotsCache, browser_manager=None, session=None, **kwargs):
+    def __init__(self, resource_management: ResourceManager, robots_parser: RobotsParser, browser_manager=None, session=None, **kwargs):
         super().__init__(resource_management, **kwargs)
-        self._robots_parser = RobotsTxtParser(robots_cache)
+        self._robots_parser = robots_parser
         self._browser_manager = browser_manager
         self._session = session
 
     @classmethod
-    async def create(cls, resource_management: ResourceManager, robots_cache: RobotsCache, **kwargs):
+    async def create(cls, resource_management: ResourceManager, robots_parser: RobotsParser, **kwargs):
         """
         Async Factory: Creates and initializes resources BEFORE instantiating the class.
         """
@@ -24,7 +24,7 @@ class FetcherBuilder(Builder):
 
         return cls(
             resource_management=resource_management,
-            robots_cache=robots_cache,
+            robots_parser=robots_parser,
             browser_manager=browser_manager,
             session=session,
             **kwargs
