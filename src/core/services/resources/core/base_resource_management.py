@@ -3,7 +3,7 @@ outputs resources like sessions
 or browserManagers
 '''
 import asyncio
-from abc import ABC
+from abc import ABC, abstractmethod
 from contextlib import AsyncExitStack
 
 import aiohttp
@@ -11,8 +11,7 @@ from fake_useragent import UserAgent
 
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
 
-
-class ResourceManager(ABC):
+class BaseResourceManager(ABC):
 
     def __init__(self, **kwargs):
         self._loop = asyncio.get_event_loop()
@@ -28,9 +27,11 @@ class ResourceManager(ABC):
     async def close(self):
         await self._stack.aclose()
 
+    @abstractmethod
     async def get_session(self, **kwargs) -> aiohttp.ClientSession:
         pass
 
+    @abstractmethod
     async def get_browser_manager(self, **kwargs) -> BrowserManager:
         pass
 

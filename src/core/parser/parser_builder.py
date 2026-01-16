@@ -32,8 +32,8 @@ from src.core.parser.core.parser_types import (
 	JavaScriptContentParser,
 	SeleniumDownloadParser,
 )
-from src.core.services.resources.base_resource_manager import BaseResourceManager
-from src.core.services.resources.core.resource_management import ResourceManager
+from src.core.services.resources.resource_manager import ResourceManager
+from src.core.services.resources.core.base_resource_management import BaseResourceManager
 
 LOGGER = Logger(APP)
 
@@ -81,7 +81,7 @@ class ParserBuilder:
 
     def __init__(
         self,
-        resource_manager: Optional[ResourceManager] = None,
+        resource_manager: Optional[BaseResourceManager] = None,
         robots_cache: Optional[RobotsCache] = None,
         robots_parser: Optional[RobotsParser] = None,
         processors: Optional[list[DataProcessor]] = None,
@@ -89,7 +89,7 @@ class ParserBuilder:
         enable_robots_refresh: bool = False
     ):
         if resource_manager is None:
-            self.resource_manager = BaseResourceManager()
+            self.resource_manager = ResourceManager()
 
         if robots_cache is None:
             self.robots_cache = InMemoryRobotsCache()

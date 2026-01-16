@@ -5,9 +5,9 @@ from typing import Optional
 import aiohttp
 
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
-from src.core.services.resources.core.resource_management import ResourceManager
+from src.core.services.resources.core.base_resource_management import BaseResourceManager
 
-class BaseResourceManager(ResourceManager):
+class ResourceManager(BaseResourceManager):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

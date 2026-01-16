@@ -1,4 +1,5 @@
 import asyncio
+import re
 from typing import Callable, Awaitable
 
 import aiohttp
@@ -11,8 +12,14 @@ LOGGER = Logger(APP)
 class ReadmeFeedWatcher(Watcher):
 
     def __init__(self, session: aiohttp.ClientSession, feed_url: str,  poll_interval=300, ) -> None:
-        self.session = session
+        if not self.is_valid_url(feed_url):
+            raise ValueError(
+                f"Invalid URL: {feed_url}\n"
+                "URL must be a GitHub API JSON endpoint.\n"
+                "Example: https://api.github.com/repos/torvalds/linux/commits"
+            )
 
+        self.session = session
         self.feed_url = feed_url
         self.poll_interval = poll_interval
         self.last_seen_sha = None
@@ -48,3 +55,18 @@ class ReadmeFeedWatcher(Watcher):
         async with self.session.get(url) as response:
             response.raise_for_status()
             return await response.json()
+
+    @staticmethod
+    def is_valid_url(url: str) -> bool:
+        """
+        Validates that the URL is a GitHub API JSON endpoint for commits.
+
+        Valid format: https://api.github.com/repos/{owner}/{repo}/commits
+        """
+        # 1. Starts with https://api.github.com
+        # 2. Followed by /repos/
+        # 3. Followed by owner/repo/ (allowing numbers, underscores, hyphens, dots)
+        # 4. Ends with /commits (optionally followed by query params like ?sha=main)
+        pattern = r"^https://api\.github\.com/repos/[\w-]+/[\w.-]+/commits(\?.*)?$"
+
+        return bool(re.match(pattern, url))

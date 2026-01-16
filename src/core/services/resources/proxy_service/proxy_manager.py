@@ -9,13 +9,13 @@ import aiohttp
 from src.core.parser.components.fetchers.components.session.aioproxy import AioProxy
 from src.core.services.resources.proxy_service.formatter.proxy_formatter import BasicProxyFormatter, \
     SeleniumWireProxyFormatter
-from src.core.services.resources.core.resource_management import ResourceManager
+from src.core.services.resources.core.base_resource_management import BaseResourceManager
 
 if TYPE_CHECKING:
     from src.core.services.resources.proxy_service.proxy import Proxy
     from src.core.parser.components.fetchers.components.browser.proxy_browser_manager import ProxyBrowserManager
 
-class ProxyManager(ResourceManager):
+class ProxyManager(BaseResourceManager):
 
     def __init__(self, proxy_pool: list[str], **kwargs):
         super().__init__(**kwargs)

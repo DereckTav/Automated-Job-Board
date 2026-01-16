@@ -1,0 +1,16 @@
+# Specific settings for the HireBase Manager
+hirebase_manager:
+  hire_base_api: 'https://api.hirebase.org/v2/jobs/vsearch'
+
+  query_postfix: 'Intern' # optional
+
+  # API PAYLOAD
+  defaults:
+    search_type: 'summary'
+    accuracy: 'high'
+    top_k: 5000  # because of date filter
+    limit: 100
+    page: 1
+    # specifically Internships
+    job_type:
+      - 'Internship'

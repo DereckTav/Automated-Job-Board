@@ -1,11 +1,11 @@
 from abc import ABC
 
-from src.core.services.resources.core.resource_management import ResourceManager
+from src.core.services.resources.core.base_resource_management import BaseResourceManager
 
 
 class Builder(ABC):
 
-    def __init__(self, resource_management: ResourceManager, **kwargs):
+    def __init__(self, resource_management: BaseResourceManager, **kwargs):
         self.resource_management = resource_management
 
     def build_http_content_fetcher(self):

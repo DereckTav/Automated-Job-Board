@@ -3,18 +3,18 @@ from src.core.parser.components.fetchers.core.builder import Builder
 from src.core.parser.components.fetchers.core.fetcher_types import (
     HttpContentFetcher, SeleniumContentFetcher, DownloadContentFetcher, AirtableSeleniumContentFetcher
 )
-from src.core.services.resources.core.resource_management import ResourceManager
+from src.core.services.resources.core.base_resource_management import BaseResourceManager
 
 
 class FetcherBuilder(Builder):
-    def __init__(self, resource_management: ResourceManager, robots_parser: RobotsParser, browser_manager=None, session=None, **kwargs):
+    def __init__(self, resource_management: BaseResourceManager, robots_parser: RobotsParser, browser_manager=None, session=None, **kwargs):
         super().__init__(resource_management, **kwargs)
         self._robots_parser = robots_parser
         self._browser_manager = browser_manager
         self._session = session
 
     @classmethod
-    async def create(cls, resource_management: ResourceManager, robots_parser: RobotsParser, **kwargs):
+    async def create(cls, resource_management: BaseResourceManager, robots_parser: RobotsParser, **kwargs):
         """
         Async Factory: Creates and initializes resources BEFORE instantiating the class.
         """
@@ -54,3 +54,11 @@ class FetcherBuilder(Builder):
         return AirtableSeleniumContentFetcher(
             self._browser_manager
         )
+
+'''
+def create(self):
+    if not hasattr(self._resource_manager, 'get_hirebase_token'):
+        raise TypeError("The provided Resource Manager does not support Hirebase tokens.")
+    
+    return Fetcher(manager=self._resource_manager)
+    '''

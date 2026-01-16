@@ -392,7 +392,3 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
 
         LOGGER.error(f"{url}... --- (Airtable Selenium) Error with files in download directory: {download_dir}")
         return None
-
-
-
-# Todo JobSpy fetcher
