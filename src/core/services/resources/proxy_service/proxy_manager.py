@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import tempfile
 import time
 from typing import TYPE_CHECKING, Optional
@@ -22,6 +23,12 @@ class ProxyManager(BaseResourceManager):
         self._proxy_pool = proxy_pool
         self._index = 0
 
+        self._session: Optional[AioProxy] = None
+        self._proxy_browser_manager: Optional[ProxyBrowserManager] = None
+
+        self._session_lock = asyncio.Lock()
+        self._pbm_lock = asyncio.Lock()
+
     def _get_next_raw_proxy(self) -> str:
         if not self._proxy_pool:
             raise ValueError("Proxy pool is empty.")
@@ -42,8 +49,21 @@ class ProxyManager(BaseResourceManager):
         await proxy_obj.change_proxy(new_proxies, **kwargs)
 
     async def get_session(self, **kwargs) -> aiohttp.ClientSession:
-        proxy = self._get_next_raw_proxy()
-        return await self._stack.enter_async_context(AioProxy(proxy=proxy, proxy_manager=self, proxy_formatter=BasicProxyFormatter()))
+        if self._session:
+            return self._session
+
+        async with self._session_lock:
+            if self._session:
+                return self._session
+
+            proxy = self._get_next_raw_proxy()
+            self._session = await self._stack.enter_async_context(AioProxy(
+                proxy=proxy,
+                proxy_manager=self,
+                proxy_formatter=BasicProxyFormatter()
+            ))
+
+            return self._session
 
     async def get_browser_manager(self,
         headless: bool = True,
@@ -51,21 +71,30 @@ class ProxyManager(BaseResourceManager):
         use_download_dir: Optional[bool] = False,
         **kwargs
     ) -> ProxyBrowserManager:
-        download_dir = None
-        if use_download_dir:
-            download_dir = await self._loop.run_in_executor(None, lambda: tempfile.mkdtemp(
-                prefix=f'downloads_{int(time.time() * 1000)}'
-            )) # type: ignore
+        if self._proxy_browser_manager:
+            return self._proxy_browser_manager
 
-        pbm = await self._stack.enter_async_context(ProxyBrowserManager(
-            proxy_manager=self,
-            proxy_formatter=SeleniumWireProxyFormatter(),
-            headless=headless,
-            max_browser_instances=max_browser_instances,
-            download_dir=download_dir
-        ))
+        async with self._pbm_lock:
+            if self._proxy_browser_manager:
+                return self._proxy_browser_manager
 
-        new_proxies = [self._get_next_raw_proxy() for _ in range(max_browser_instances)]
-        await pbm.configure_proxies(new_proxies)
+            from src.core.parser.components.fetchers.components.browser.proxy_browser_manager import ProxyBrowserManager
 
-        return pbm
+            download_dir = None
+            if use_download_dir:
+                download_dir = await self._loop.run_in_executor(None, lambda: tempfile.mkdtemp(
+                    prefix=f'downloads_{int(time.time() * 1000)}'
+                )) # type: ignore
+
+            self._proxy_browser_manager = await self._stack.enter_async_context(ProxyBrowserManager(
+                proxy_manager=self,
+                proxy_formatter=SeleniumWireProxyFormatter(),
+                headless=headless,
+                max_browser_instances=max_browser_instances,
+                download_dir=download_dir
+            ))
+
+            new_proxies = [self._get_next_raw_proxy() for _ in range(max_browser_instances)]
+            await self._proxy_browser_manager.configure_proxies(new_proxies)
+
+            return self._proxy_browser_manager
