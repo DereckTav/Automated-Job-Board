@@ -394,5 +394,5 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
         return None
 
 
-# Todo implement rss
+
 # Todo JobSpy fetcher

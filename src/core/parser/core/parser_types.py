@@ -155,5 +155,4 @@ class SeleniumDownloadParser(BaseParser):
             LOGGER.info(f"{url}... --- ({self.__class__.__name__}) failed to extract data from csv: \n {e} \n")
             return {}
 
-# Todo implement rss parser
 # Todo JobSpy parser
