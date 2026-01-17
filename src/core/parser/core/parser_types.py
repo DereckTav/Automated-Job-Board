@@ -155,3 +155,4 @@ class SeleniumDownloadParser(BaseParser):
             LOGGER.info(f"{url}... --- ({self.__class__.__name__}) failed to extract data from csv: \n {e} \n")
             return {}
 
+#todo for the hireparser it will prob be banned by some filters and pipelines

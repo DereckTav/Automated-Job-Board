@@ -1,7 +1,5 @@
 # Specific settings for the HireBase Manager
 hirebase_manager:
-  hire_base_api: 'https://api.hirebase.org/v2/jobs/vsearch'
-
   query_postfix: 'Intern' # optional
 
   # API PAYLOAD

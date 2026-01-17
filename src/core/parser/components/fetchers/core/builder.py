@@ -6,7 +6,7 @@ from src.core.services.resources.core.base_resource_management import BaseResour
 class Builder(ABC):
 
     def __init__(self, resource_management: BaseResourceManager, **kwargs):
-        self.resource_management = resource_management
+        self._resource_management = resource_management
 
     def build_http_content_fetcher(self):
         pass
@@ -18,4 +18,7 @@ class Builder(ABC):
         pass
 
     def build_airtable_selenium_content_fetcher(self):
+        pass
+
+    def build_hire_base_content_fetcher(self):
         pass

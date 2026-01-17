@@ -3,7 +3,7 @@ import aiohttp
 from src.core.parser.components.fetchers.components.browser.browser_manager import BrowserManager
 from src.core.parser.components.fetchers.core.exceptions.robots_txt_not_provided import RobotsTxtNotProvided
 from src.core.parser.components.fetchers.core.fetcher import  ContentFetcher
-from typing import Optional
+from typing import Optional, Any
 import asyncio
 
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -392,3 +392,61 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
 
         LOGGER.error(f"{url}... --- (Airtable Selenium) Error with files in download directory: {download_dir}")
         return None
+
+class HireBaseContentFetcher(ContentFetcher):
+    """
+    Fetches API content that returns a List of Json objects (one for each request payload).
+    """
+
+    def __init__(
+            self,
+            session: aiohttp.ClientSession,
+            headers: dict[str, str],
+            requests_payloads: list[dict[str, Any]]
+    ):
+        self.session = session
+        self.headers = headers
+        self.requests_payloads = requests_payloads
+
+    async def fetch(
+            self,
+            url: str,
+            **kwargs
+    ) -> Optional[list[dict[str, Any]]]:
+
+        if not self.requests_payloads:
+            LOGGER.warning("(HireBaseContentFetcher) No requests provided.")
+            return []
+
+        valid_responses = []
+        total = len(self.requests_payloads)
+
+        LOGGER.info(f"{url} --- (HireBaseContentFetcher) Starting fetch of {total} requests")
+
+        for i, payload in enumerate(self.requests_payloads):
+            query_name = payload.get('query', f'Request #{i + 1}')
+
+            try:
+                LOGGER.info(f"(HireBaseContentFetcher) Processing request {i + 1}/{total}... ['{query_name}']")
+
+                result = await self._fetch_single(url, self.headers, payload)
+
+                if result:
+                    valid_responses.append(result)
+
+                if i < total - 1:
+                    await asyncio.sleep(1) # rate limit
+
+            except Exception as e:
+                LOGGER.error(f"(HireBaseContentFetcher) FAILED Request '{query_name}': {e}")
+
+        LOGGER.info(f"(HireBaseContentFetcher) Finished. Success: {len(valid_responses)}/{total}")
+        return valid_responses
+
+    async def _fetch_single(self, url: str, headers: dict, payload: dict) -> Optional[dict[str, Any]]:
+        """
+        Helper method to handle a single POST request safely.
+        """
+        async with self.session.post(url, json=payload, headers=headers) as response:
+            response.raise_for_status()
+            return await response.json()

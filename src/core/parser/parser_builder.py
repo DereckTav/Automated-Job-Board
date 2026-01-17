@@ -53,6 +53,9 @@ LOGGER = Logger(APP)
     - By blocking what you want in the blacklist, everything else passes as long as long as there is NO WHITELIST.
 """
 
+#todo figure out filters.yaml
+#Todo review what parsers should be where
+
 # put parser names example: 'DownloadParser'
 CHANGE_DETECTION_PROCESSOR = {
     "include_parsers": [],

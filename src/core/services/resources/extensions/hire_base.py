@@ -11,7 +11,6 @@ LOGGER = Logger(APP)
 class HireBaseMixin:
     def __init__(
             self,
-            hire_base_api: str,
             api_key: str,
             types: list[str],
             defaults: dict[str, Any],
@@ -20,7 +19,6 @@ class HireBaseMixin:
             api_limit: Optional[int] = 10,
             **kwargs
     ):
-        self.hire_base_api = hire_base_api
         self.api_key = api_key
 
         if len(types) > api_limit:
@@ -47,9 +45,6 @@ class HireBaseMixin:
             payloads.append(payload)
 
         return payloads
-
-    def get_api_endpoint(self) -> str:
-        return self.hire_base_api
 
     def get_headers(self) -> dict[str, str]:
         return {

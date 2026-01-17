@@ -1,10 +1,10 @@
 from src.core.parser.components.fetchers.components.robots.parser import RobotsParser
 from src.core.parser.components.fetchers.core.builder import Builder
 from src.core.parser.components.fetchers.core.fetcher_types import (
-    HttpContentFetcher, SeleniumContentFetcher, DownloadContentFetcher, AirtableSeleniumContentFetcher
+    HttpContentFetcher, SeleniumContentFetcher, DownloadContentFetcher, AirtableSeleniumContentFetcher,
+    HireBaseContentFetcher
 )
 from src.core.services.resources.core.base_resource_management import BaseResourceManager
-
 
 class FetcherBuilder(Builder):
     def __init__(self, resource_management: BaseResourceManager, robots_parser: RobotsParser, browser_manager=None, session=None, **kwargs):
@@ -18,7 +18,6 @@ class FetcherBuilder(Builder):
         """
         Async Factory: Creates and initializes resources BEFORE instantiating the class.
         """
-
         browser_manager = await resource_management.get_browser_manager()
         session = await resource_management.get_session()
 
@@ -33,21 +32,21 @@ class FetcherBuilder(Builder):
     def build_http_content_fetcher(self):
         return HttpContentFetcher(
             self._session,
-            self.resource_management.get_random_user_agent(),
+            self._resource_management.get_random_user_agent(),
             self._robots_parser
         )
 
     def build_selenium_content_fetcher(self):
         return SeleniumContentFetcher(
             self._browser_manager,
-            self.resource_management.get_random_user_agent(),
+            self._resource_management.get_random_user_agent(),
             self._robots_parser
         )
 
     def build_download_content_fetcher(self):
         return DownloadContentFetcher(
             self._session,
-            self.resource_management.get_random_user_agent()
+            self._resource_management.get_random_user_agent()
         )
 
     def build_airtable_selenium_content_fetcher(self):
@@ -55,10 +54,15 @@ class FetcherBuilder(Builder):
             self._browser_manager
         )
 
-'''
-def create(self):
-    if not hasattr(self._resource_manager, 'get_hirebase_token'):
-        raise TypeError("The provided Resource Manager does not support Hirebase tokens.")
-    
-    return Fetcher(manager=self._resource_manager)
-    '''
+    def build_hire_base_content_fetcher(self):
+        if not hasattr(self._resource_management, 'get_headers'):
+            raise TypeError("The provided Resource Manager does not support get_headers.")
+
+        if not hasattr(self._resource_management, 'get_requests'):
+            raise TypeError("The provided Resource Manager does not support get_requests.")
+
+        return HireBaseContentFetcher(
+            session=self._session,
+            headers=self._resource_management.get_headers(),
+            requests_payloads=self._resource_management.get_requests()
+        )
