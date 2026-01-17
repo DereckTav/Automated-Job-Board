@@ -14,6 +14,10 @@ from src.core.parser.components.fetchers.components.browser.browser_manager impo
 class BaseResourceManager(ABC):
 
     def __init__(self, **kwargs):
+        """manages resources required by application.
+
+            examples: browsers or aiohttp.ClientSession
+        """
         self._loop = asyncio.get_event_loop()
         self._stack = AsyncExitStack()
         self.ua = UserAgent()

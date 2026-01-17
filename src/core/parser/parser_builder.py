@@ -13,7 +13,7 @@ from src.core.parser.components.fetchers.components.robots.refreshers import (
     RobotsCacheRefresher,
 )
 from src.core.parser.components.fetchers.fetcher_builder import FetcherBuilder
-from src.core.parser.components.pipelines.data_processing.data_processor import DataProcessor
+from src.core.parser.components.pipelines.data_processing.base_data_processor import BaseDataProcessor
 from src.core.parser.components.pipelines.data_processing.data_processors import (
     ChangeDetectionProcessor,
     DateFilterProcessor,
@@ -27,10 +27,11 @@ from src.core.parser.components.pipelines.data_processing.trackers.tracker impor
 from src.core.parser.components.pipelines.pipeline import ProcessingPipeline
 from src.core.parser.core.base_parser import ParserDependencies
 from src.core.parser.core.parser_types import (
-	DownloadParser,
+	DownloadCSVParser,
+    SeleniumDownloadParser,
 	StaticContentParser,
 	JavaScriptContentParser,
-	SeleniumDownloadParser,
+    HireBaseParser,
 )
 from src.core.services.resources.resource_manager import ResourceManager
 from src.core.services.resources.core.base_resource_management import BaseResourceManager
@@ -53,13 +54,10 @@ LOGGER = Logger(APP)
     - By blocking what you want in the blacklist, everything else passes as long as long as there is NO WHITELIST.
 """
 
-#todo figure out filters.yaml
-#Todo review what parsers should be where
-
-# put parser names example: 'DownloadParser'
+# put parser names example: 'DownloadCSVParser'
 CHANGE_DETECTION_PROCESSOR = {
     "include_parsers": [],
-    "exclude_parsers": [],
+    "exclude_parsers": ['HireBaseParser'],
 }
 
 DATE_FILTER_PROCESSOR = {
@@ -87,7 +85,7 @@ class ParserBuilder:
         resource_manager: Optional[BaseResourceManager] = None,
         robots_cache: Optional[RobotsCache] = None,
         robots_parser: Optional[RobotsParser] = None,
-        processors: Optional[list[DataProcessor]] = None,
+        processors: Optional[list[BaseDataProcessor]] = None,
         tracker: Optional[ChangeTracker] = None,
         enable_robots_refresh: bool = False
     ):
@@ -159,13 +157,13 @@ class ParserBuilder:
         if self.robots_refresher:
             await self.robots_refresher.__aexit__(exc_type, exc_val, exc_tb)
 
-    def build_download_parser(self) -> DownloadParser:
+    def build_download_parser(self) -> DownloadCSVParser:
         LOGGER.info('(PARSER_BUILDER) building download_parser')
         download_fetcher = self.fetcher_builder.build_download_content_fetcher()
 
         deps = ParserDependencies(download_fetcher, self.pipeline)
 
-        return DownloadParser(deps)
+        return DownloadCSVParser(deps)
 
     def create_static_parser(self) -> StaticContentParser:
         LOGGER.info('(PARSER_BUILDER) building static_parser')
@@ -184,10 +182,19 @@ class ParserBuilder:
         return JavaScriptContentParser(deps)
 
     def create_airtable_download_parser(self) -> SeleniumDownloadParser:
-        LOGGER.info('(PARSER_BUILDER) building airtable_download_parser')
+        LOGGER.info('(PARSER_BUILDER) building airtable_download_parser (DownloadCSVParser)')
 
         airtable_fetcher = self.fetcher_builder.build_airtable_selenium_content_fetcher()
 
         deps = ParserDependencies(airtable_fetcher, self.pipeline)
 
         return SeleniumDownloadParser(deps)
+
+    def create_hire_base_parser(self) -> HireBaseParser:
+        LOGGER.info('(PARSER_BUILDER) building hire_base_parser')
+
+        hire_base_fetcher = self.fetcher_builder.build_hire_base_content_fetcher()
+
+        deps = ParserDependencies(hire_base_fetcher, self.pipeline)
+
+        return HireBaseParser(deps)

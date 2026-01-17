@@ -1,5 +1,5 @@
 from src.core.logs import Logger
-from src.core.parser.components.pipelines.data_processing.data_processor import DataProcessor
+from src.core.parser.components.pipelines.data_processing.base_data_processor import BaseDataProcessor
 from typing import List, Dict, Any
 import pandas as pd
 
@@ -10,7 +10,7 @@ class ProcessingPipeline:
     Executes processors in order.
     """
 
-    def __init__(self, processors: List[DataProcessor]):
+    def __init__(self, processors: List[BaseDataProcessor]):
         self.processors = processors
 
     async def execute(

@@ -15,10 +15,42 @@ class HireBaseMixin:
             types: list[str],
             defaults: dict[str, Any],
             query_postfix: str = "",
-            days_ago: Optional[int] = 2,
+            posted_days_ago: Optional[int] = 1,
             api_limit: Optional[int] = 10,
             **kwargs
     ):
+        """
+        extension for resource managers.
+
+        :param api_key:
+            The authentication key required to access the HireBase API.
+
+        :param types:
+            A list of job categories or titles to search for (e.g., ['Software Engineer', 'Data Scientist']).
+            Each item in this list will generate a separate API request.
+
+        :param defaults:
+            A dictionary containing default API parameters applied to every request.
+            Typical keys include 'top_k', 'limit', 'accuracy', and 'search_type'.
+
+        :param query_postfix:
+            A string to append to every search query in the 'types' list.
+            Useful for narrowing results (e.g., set to 'Intern' to turn 'Software Engineer' into 'Software Engineer Intern').
+            Defaults to "".
+
+        :param posted_days_ago:
+            Filters jobs posted within the last N days.
+            Calculates the specific date based on the current time and sends it to the API.
+            Defaults to 1.
+
+        :param api_limit:
+            The maximum number of API requests allowed per run (or per day).
+            Used to safely truncate the 'types' list to avoid hitting rate limits.
+            Defaults to 10.
+
+        :param kwargs:
+            Additional arguments passed to the parent resource managers
+        """
         self.api_key = api_key
 
         if len(types) > api_limit:
@@ -28,7 +60,7 @@ class HireBaseMixin:
 
         self.defaults = defaults
         self.query_postfix = query_postfix
-        self.days_ago = days_ago
+        self.days_ago = posted_days_ago
 
         super().__init__(**kwargs)
 

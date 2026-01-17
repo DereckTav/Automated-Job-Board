@@ -17,7 +17,7 @@ from abc import abstractmethod, ABC
 from typing import Dict, Any, List
 import pandas as pd
 
-class DataProcessor(ABC):
+class BaseDataProcessor(ABC):
     """
     Abstraction for data processing steps.
     """

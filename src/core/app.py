@@ -59,7 +59,9 @@ def verify(websites: dict):
             print(f"Warning: No selectors found for {website_name}")
             sys.exit()
 
-
+# todo verify configs
+# todo verify that dateformate is a formate with --relative whereit  has {n}
+# todo verify that date formate has at least day in teh formate
 class Manager:
     """
     Manages parser lifecycle and coordination.
