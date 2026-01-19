@@ -1,4 +1,4 @@
-# Configs Documentation
+**# Configs Documentation
 
 ## Preface
 
@@ -28,8 +28,6 @@ These modules are interconnected, following a specific dependency hierarchy:
 
 
 ## Sources.yaml
-
----
 
 ### Field Reference
 
@@ -61,8 +59,6 @@ See **[Json Path Formating](#json-path-formatting)** for details on writing API 
 
 
 ## Filters.yaml
-
----
 
 This configuration file controls filters in the **Data Processing Pipeline**. It defines rules for cleaning data, ignoring unwanted jobs, and normalizing formats before they reach the board.
 
@@ -101,8 +97,6 @@ Designed for tables where the company name is listed once at the top, and subseq
 
 ## Extensions.yaml
 
----
-
 This file serves as the central configuration for `services.resources.extensions`.
 
 **What is an Extension?**
@@ -130,8 +124,6 @@ These values define the standard behavior for the API client.
 
 ## Types.yaml
 
----
-
 This file contains the **static configuration** defining the valid job categories (taxonomies) for the application. It dictates the structure of the job board and validates job classification.
 
 ### Key Functions
@@ -140,9 +132,9 @@ This file contains the **static configuration** defining the valid job categorie
 
 > **⚠️ Limit Warning (HireBase Only):**
 > If using the `hire_base` parser, the system treats these types as individual search queries. If more than **10 types** are defined, only the **first 10** will be used to prevent API rate limiting.
+
 ## appendix
 
----
 <a id="supported-parsers"></a>
 ### Supported Parsers
 
