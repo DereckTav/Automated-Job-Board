@@ -1,4 +1,4 @@
-**# Configs Documentation
+# Configs Documentation
 
 ## Preface
 
