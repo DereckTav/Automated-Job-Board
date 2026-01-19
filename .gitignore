@@ -34,8 +34,7 @@ log/
 
 # Collection of Websites that are being parsed
 configs/filters.yaml
-configs/types.yaml
-configs/sites.yaml
+configs/sources.yaml
 configs/old.yaml
 
 #integrations

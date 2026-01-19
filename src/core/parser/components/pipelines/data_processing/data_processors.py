@@ -131,7 +131,7 @@ class FiltersProcessor(BaseDataProcessor):
         # Get categorized filters
         filters = get_from(
             filters,
-            config.get('site_id'),
+            config.get('source_id'),
             list(config.get('selectors').keys()),
             list(strategies.keys())
         )
