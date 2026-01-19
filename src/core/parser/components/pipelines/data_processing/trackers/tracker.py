@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 '''
-trackes most recent seen job
+tracks most recent seen job
 '''
 
 class ChangeTracker(ABC):

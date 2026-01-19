@@ -201,17 +201,17 @@ When using an **API** parser, selectors use **dot notation** to traverse the JSO
 
 #### 1. Selecting Data
 
-| Target | Selector Path | Result |
-| :--- | :--- | :--- |
-| **Specific Value** | `job.details.remote` | `true` |
-| **Specific Text** | `job.details.title` | `"Software Engineer"` |
-| **Entire Object** | `job.details` | `{ "title": "...", "remote": ... }` |
+| Target             | Selector Path        | Result                              |
+|:-------------------|:---------------------|:------------------------------------|
+| **Specific Value** | `job.details.remote` | `true`                              |
+| **Specific Text**  | `job.details.title`  | `"Software Engineer"`               |
+| **Entire Object**  | `job.details`        | `{ "title": "...", "remote": ... }` |
 
 #### 2. Output Serialization (HireBase)
 
-| Data Type | Formatting Rule | Example Output |
-| :--- | :--- | :--- |
-| **List** | Joined by commas | `"Python, Rust"` |
+| Data Type      | Formatting Rule                    | Example Output                             |
+|:---------------|:-----------------------------------|:-------------------------------------------|
+| **List**       | Joined by commas                   | `"Python, Rust"`                           |
 | **Dictionary** | Newline-separated Key: Value pairs | `"title: Software Engineer\nremote: true"` |
-| **Null/None** | Converted to empty string | `""` |
-| **Primitives** | Converted to string | `"123"` |
+| **Null/None**  | Converted to empty string          | `""`                                       |
+| **Primitives** | Converted to string                | `"123"`                                    |

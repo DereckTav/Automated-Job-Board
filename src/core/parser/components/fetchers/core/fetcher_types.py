@@ -364,7 +364,7 @@ class AirtableSeleniumContentFetcher(ContentFetcher):
                 continue
 
             # Check if the final .csv exists
-            csv_files = [f for f in files if f.endswith('.csv')]
+            csv_files = [f for f in files if f.endswith('.csv')] # type: ignore
 
             await asyncio.sleep(1)
             seconds_elapsed += 1

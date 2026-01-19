@@ -2,7 +2,6 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from src.core.parser.components.pipelines.data_processing.trackers.tracker import ChangeTracker
 from src.core.parser.components.fetchers.core.fetcher import ContentFetcher
 from src.core.parser.components.pipelines.pipeline import ProcessingPipeline
 
