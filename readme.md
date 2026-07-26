@@ -1,4 +1,4 @@
-# being refactored due to some failures
+# This repository represents the last stable implementation. Development is currently paused while a redesigned parser architecture is being implemented on the refactor branch.
 
 # ~~📄[Current Running Job Board](https://www.notion.so/2a8048332b6880ce8cbef9b77bc7d8b1?v=2a8048332b6881f6b8b1000c1b188b85&source=copy_link)~~
 
